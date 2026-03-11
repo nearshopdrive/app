@@ -2659,7 +2659,42 @@ function removeExistingPhoto(idx,el){
 
 async function deleteStore(id){
   if(!confirm('Supprimer ce magasin définitivement ?'))return;
-  try{await fb.deleteDoc(fb.doc(fb.db,'stores',id));showToast('🗑️ Magasin supprimé !');}
+  try{
+    // 1. Récupérer les infos du magasin avant suppression
+    const snap = await fb.db.collection('stores').doc(id).get();
+    const s = snap.exists ? snap.data() : {};
+
+    // 2. Supprimer dans Firestore
+    await fb.deleteDoc(fb.doc(fb.db,'stores',id));
+
+    // 3. Marquer comme SUPPRIMÉ dans Google Sheet (via firestoreId)
+    if(window.GSHEET_URL && id){
+      const params = new URLSearchParams({
+        type:        'merchant',
+        name:        s.name     || '–',
+        cat:         s.cat      || '–',
+        address:     s.address  || '–',
+        phone:       s.phone    || '–',
+        whatsapp:    s.whatsapp || '–',
+        email:       s.email    || '–',
+        hours:       s.hours    || '–',
+        desc:        s.desc     || '–',
+        photoUrl:    (s.photos && s.photos[0]) || '',
+        lat:         s.lat      || '',
+        lng:         s.lng      || '',
+        ownerEmail:  s.ownerEmail || '',
+        ownerUid:    s.ownerId    || '',
+        firestoreId: id,
+        submittedAt: new Date().toISOString(),
+        status:      'SUPPRIMÉ'
+      });
+      fetch(window.GSHEET_URL + '?' + params.toString(), {method:'GET', mode:'no-cors'})
+        .then(()=>console.log('[NearShop] ✅ Magasin marqué SUPPRIMÉ dans Sheet'))
+        .catch(e=>console.warn('[NearShop] Sheet sync error:', e));
+    }
+
+    showToast('🗑️ Magasin supprimé !');
+  }
   catch(e){showToast('❌ '+e.message);}
 }
 
