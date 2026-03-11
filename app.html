@@ -1671,6 +1671,23 @@ async function loadMerchantPortal(){
         <textarea id="meditDesc" rows="3" placeholder="Décrivez votre commerce, vos produits..." style="width:100%;background:var(--bg);border:1px solid var(--border);border-radius:9px;padding:9px 12px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:.88rem;outline:none;resize:vertical;transition:border-color .2s" onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='var(--border)'"></textarea>
       </div>
 
+      <!-- ── PHOTOS ── -->
+      <div style="margin-bottom:14px">
+        <div style="font-size:.7rem;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.4px;margin-bottom:8px">📸 Photos</div>
+
+        <!-- Photos existantes -->
+        <div id="meditPhotosPreview" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px"></div>
+
+        <!-- Bouton ajouter photo -->
+        <label style="display:flex;align-items:center;gap:8px;cursor:pointer;background:var(--bg);border:2px dashed var(--border);border-radius:10px;padding:10px 14px;transition:border-color .2s"
+               onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'">
+          <span style="font-size:1.2rem">➕</span>
+          <span style="font-size:.82rem;color:var(--muted)">Ajouter une photo</span>
+          <input type="file" id="meditPhotoInput" accept="image/*" multiple style="display:none" onchange="uploadMeditPhotos(this)">
+        </label>
+        <div id="meditPhotoUploadStatus" style="display:none;font-size:.75rem;color:var(--accent);margin-top:6px;text-align:center">⏳ Upload en cours...</div>
+      </div>
+
       <!-- Statut -->
       <div style="margin-bottom:14px">
         <div style="font-size:.7rem;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.4px;margin-bottom:6px">🏪 Statut</div>
@@ -1718,6 +1735,55 @@ async function loadMerchantPortal(){
 //  MERCHANT SELF-EDIT
 // ══════════════════════════════════
 let _meditStatus = 'open';
+let _meditPhotos = []; // tableau des URLs photos en cours d'édition
+
+function renderMeditPhotos() {
+  const container = document.getElementById('meditPhotosPreview');
+  if (!container) return;
+  if (_meditPhotos.length === 0) {
+    container.innerHTML = '<div style="font-size:.75rem;color:var(--muted);font-style:italic">Aucune photo</div>';
+    return;
+  }
+  container.innerHTML = _meditPhotos.map((url, i) => `
+    <div style="position:relative;width:80px;height:80px;border-radius:10px;overflow:hidden;border:2px solid var(--border);flex-shrink:0">
+      <img src="${url}" style="width:100%;height:100%;object-fit:cover" loading="lazy">
+      <button onclick="removeMeditPhoto(${i})"
+        style="position:absolute;top:3px;right:3px;background:rgba(0,0,0,.7);border:none;color:#fff;border-radius:50%;width:20px;height:20px;font-size:.65rem;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1">✕</button>
+    </div>
+  `).join('');
+}
+
+function removeMeditPhoto(index) {
+  _meditPhotos.splice(index, 1);
+  renderMeditPhotos();
+}
+
+async function uploadMeditPhotos(input) {
+  const files = Array.from(input.files);
+  if (!files.length) return;
+  const statusEl = document.getElementById('meditPhotoUploadStatus');
+  statusEl.style.display = 'block';
+  statusEl.textContent = '⏳ Upload en cours...';
+  let uploaded = 0;
+  for (const file of files) {
+    try {
+      const fd = new FormData();
+      fd.append('file', file);
+      fd.append('upload_preset', CLOUDINARY_PRESET);
+      fd.append('folder', 'nearshop_stores');
+      const res  = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD}/image/upload`, { method:'POST', body: fd });
+      const data = await res.json();
+      if (data.secure_url) {
+        _meditPhotos.push(data.secure_url);
+        uploaded++;
+        renderMeditPhotos();
+      }
+    } catch(e) { console.warn('Upload error:', e); }
+  }
+  statusEl.textContent = uploaded > 0 ? `✅ ${uploaded} photo(s) ajoutée(s)` : '❌ Erreur upload';
+  setTimeout(() => { statusEl.style.display = 'none'; }, 3000);
+  input.value = ''; // reset input
+}
 
 function openMerchantEdit(storeId) {
   const s = stores.find(x => x.id === storeId);
@@ -1736,6 +1802,10 @@ function openMerchantEdit(storeId) {
   document.getElementById('meditDesc').value      = s.desc    || '';
   _meditStatus = s.status || 'open';
   setMeditStatus(_meditStatus);
+
+  // Charger les photos existantes
+  _meditPhotos = Array.isArray(s.photos) ? [...s.photos] : (s.photos ? [s.photos] : []);
+  renderMeditPhotos();
   const form = document.getElementById('merchantEditForm');
   form.style.display = 'block';
   form.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -1803,9 +1873,10 @@ async function saveMerchantEdit() {
   errEl.style.display = 'none';
 
   try {
-    // 1. Mettre à jour Firestore
+    // 1. Mettre à jour Firestore (avec photos)
     await fb.updateDoc(fb.doc(fb.db, 'stores', id), {
       phone, whatsapp, hours, desc,
+      photos: _meditPhotos,
       status: _meditStatus,
       updatedAt: fb.serverTimestamp()
     });
@@ -1823,7 +1894,7 @@ async function saveMerchantEdit() {
         email:       s.email   || currentUser.email || '',
         hours,
         desc,
-        photoUrl:    (s.photos && s.photos[0]) || '',
+        photoUrl:    (_meditPhotos && _meditPhotos[0]) || (s.photos && s.photos[0]) || '',
         lat:         s.lat || '',
         lng:         s.lng || '',
         ownerEmail:  currentUser.email || '',
