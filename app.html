@@ -1764,24 +1764,35 @@ async function uploadMeditPhotos(input) {
   const statusEl = document.getElementById('meditPhotoUploadStatus');
   statusEl.style.display = 'block';
   statusEl.textContent = '⏳ Upload en cours...';
+
+  // Utiliser la même config Cloudinary que le reste de l'app
+  const { cloud, preset } = window._cloudinary || {};
+  if (!cloud || !preset) {
+    statusEl.textContent = '❌ Config Cloudinary manquante';
+    return;
+  }
+
   let uploaded = 0;
   for (const file of files) {
     try {
       const fd = new FormData();
       fd.append('file', file);
-      fd.append('upload_preset', CLOUDINARY_PRESET);
+      fd.append('upload_preset', preset);
       fd.append('folder', 'nearshop_stores');
-      const res  = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD}/image/upload`, { method:'POST', body: fd });
+      statusEl.textContent = `⏳ Upload ${uploaded + 1}/${files.length}...`;
+      const res  = await fetch(`https://api.cloudinary.com/v1_1/${cloud}/image/upload`, { method:'POST', body: fd });
       const data = await res.json();
       if (data.secure_url) {
         _meditPhotos.push(data.secure_url);
         uploaded++;
         renderMeditPhotos();
+      } else {
+        console.warn('Cloudinary error:', data);
       }
     } catch(e) { console.warn('Upload error:', e); }
   }
-  statusEl.textContent = uploaded > 0 ? `✅ ${uploaded} photo(s) ajoutée(s)` : '❌ Erreur upload';
-  setTimeout(() => { statusEl.style.display = 'none'; }, 3000);
+  statusEl.textContent = uploaded > 0 ? `✅ ${uploaded} photo(s) ajoutée(s) — cliquez Sauvegarder` : '❌ Erreur upload';
+  setTimeout(() => { statusEl.style.display = 'none'; }, 4000);
   input.value = ''; // reset input
 }
 
