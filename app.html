@@ -2275,6 +2275,8 @@ function renderStores() {
 
   const q = (document.getElementById('searchInput')||{value:''}).value.toLowerCase();
   const filtered = stores.filter(s => {
+    // ── Seuls les commerces approuvés (status='open') sont visibles publiquement ──
+    if (s.status !== 'open') return false;
     if(userLocated){ const d=dist(s); if(d>searchRadius)return false; }
     if(catFilter!=='all'&&s.cat!==catFilter)return false;
     if(favFilter && !isFav(s.id))return false;
@@ -3575,6 +3577,7 @@ function syncSearch(el) {
 function renderStoresMobile() {
   const q = document.getElementById('searchInputMobile').value.toLowerCase();
   const filtered = stores.filter(s => {
+    if (s.status !== 'open') return false;
     const d = dist(s); if(d > searchRadius) return false;
     if(catFilter !== 'all' && s.cat !== catFilter) return false;
     if(favFilter && !isFav(s.id)) return false;
