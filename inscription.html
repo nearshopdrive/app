@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Inscrire mon commerce — NearShop Drive</title>
+<meta name="description" content="Inscrivez votre commerce sur NearShop Drive et commencez à livrer à la voiture de vos clients.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,700&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════ TOKENS ═══════════════════ */
+:root {
+  --bg:      #080b12;
+  --bg2:     #10131b;
+  --bg3:     #161d2e;
+  --border:  #1e2840;
+  --border2: #252d42;
+  --gold:    #f0c040;
+  --gold-d:  rgba(240,192,64,.1);
+  --jade:    #3dffa0;
+  --ember:   #ff6b35;
+  --chalk:   #eef0f5;
+  --muted:   #5a6680;
+  --muted2:  #8090aa;
+  --r:       14px;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; overflow-x: hidden; }
+body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--chalk); overflow-x: hidden; -webkit-tap-highlight-color: transparent; line-height: 1.6; }
+a { text-decoration: none; color: inherit; }
+
+/* Noise */
+body::before { content: ''; position: fixed; inset: 0; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E"); opacity: .018; pointer-events: none; z-index: 9999; }
+
+/* ═══════════════════ SHARED NAV ═══════════════════ */
+.ns-nav{position:fixed;top:0;left:0;right:0;z-index:500;height:64px;display:flex;align-items:center;justify-content:space-between;padding:0 clamp(16px,4vw,52px);transition:background .35s,border-color .35s;}
+.ns-nav.solid{background:rgba(8,11,18,.92);border-bottom:1px solid var(--border);backdrop-filter:blur(20px);}
+.ns-logo{font-family:'Syne',sans-serif;font-weight:800;font-size:1.1rem;letter-spacing:-.3px;display:flex;align-items:center;gap:2px;flex-shrink:0;text-decoration:none;color:inherit;}
+.ns-logo .nsg{color:var(--gold);}
+.ns-links{display:flex;align-items:center;gap:2px;}
+.ns-link{padding:7px 13px;border-radius:100px;font-size:.82rem;font-weight:500;color:var(--muted2);transition:color .18s,background .18s;white-space:nowrap;text-decoration:none;}
+.ns-link:hover{color:var(--chalk);background:rgba(255,255,255,.05);}
+.ns-link.ns-active{color:var(--chalk);}
+.ns-nav-right{display:flex;align-items:center;gap:10px;}
+.ns-cta-btn{background:var(--gold);color:#000;font-family:'Syne',sans-serif;font-weight:700;font-size:.82rem;padding:9px 18px;border-radius:100px;transition:transform .15s,box-shadow .15s;white-space:nowrap;text-decoration:none;}
+.ns-cta-btn:hover{transform:translateY(-1px);box-shadow:0 6px 22px rgba(240,192,64,.4);}
+.ns-burger{display:none;flex-direction:column;gap:5px;background:none;border:none;cursor:pointer;padding:6px;}
+.ns-burger span{display:block;width:22px;height:2px;background:var(--chalk);border-radius:2px;transition:all .25s;}
+.ns-burger.open span:nth-child(1){transform:translateY(7px) rotate(45deg);}
+.ns-burger.open span:nth-child(2){opacity:0;}
+.ns-burger.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg);}
+.ns-drawer{display:none;position:fixed;top:64px;left:0;right:0;z-index:490;background:rgba(8,11,18,.97);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);flex-direction:column;padding:16px;gap:4px;transform:translateY(-8px);opacity:0;transition:opacity .25s,transform .25s;pointer-events:none;}
+.ns-drawer.open{display:flex;transform:translateY(0);opacity:1;pointer-events:all;}
+.ns-drawer .ns-link{font-size:.95rem;padding:12px 16px;border-radius:12px;}
+.ns-drawer .ns-cta-btn{text-align:center;padding:13px;border-radius:12px;margin-top:8px;display:block;}
+@media(max-width:860px){.ns-links{display:none;}.ns-burger{display:flex;}}
+@media(max-width:500px){.ns-nav .ns-cta-btn{display:none;}}
+
+/* ═══════════════════ HERO ═══════════════════ */
+.hero {
+  padding: 100px clamp(20px,5vw,72px) 60px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.hero::before { content: ''; position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 700px; height: 500px; background: radial-gradient(ellipse, rgba(240,192,64,.08), transparent 65%); pointer-events: none; }
+.hero-grid { position: absolute; inset: 0; background-image: linear-gradient(var(--border) 1px, transparent 1px), linear-gradient(90deg, var(--border) 1px, transparent 1px); background-size: 60px 60px; mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 20%, transparent 80%); opacity: .3; pointer-events: none; }
+
+.hero-badge { display: inline-flex; align-items: center; gap: 8px; background: rgba(61,255,160,.1); border: 1px solid rgba(61,255,160,.25); color: var(--jade); border-radius: 100px; padding: 6px 16px; font-size: .72rem; font-weight: 700; letter-spacing: .5px; text-transform: uppercase; margin-bottom: 22px; }
+.pulse-green { width: 8px; height: 8px; border-radius: 50%; background: var(--jade); animation: blinkDot 1.8s infinite; }
+@keyframes blinkDot { 0%,100%{opacity:1;} 50%{opacity:.25;} }
+
+.hero-title { font-family: 'Syne', sans-serif; font-size: clamp(2.2rem, 5vw, 3.8rem); font-weight: 800; letter-spacing: -2px; line-height: 1.08; margin-bottom: 18px; position: relative; }
+.hero-title .gold { color: var(--gold); }
+.hero-desc { font-size: clamp(.9rem, 1.8vw, 1.05rem); color: var(--muted2); max-width: 520px; margin: 0 auto 36px; font-weight: 300; line-height: 1.7; position: relative; }
+.hero-desc strong { color: var(--chalk); font-weight: 500; }
+
+/* Steps mini */
+.hero-steps { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; margin-bottom: 0; position: relative; }
+.hero-step { display: flex; align-items: center; gap: 8px; background: var(--bg2); border: 1px solid var(--border); border-radius: 100px; padding: 8px 16px; font-size: .78rem; font-weight: 500; color: var(--muted2); }
+.hero-step .hs-num { width: 22px; height: 22px; border-radius: 50%; background: var(--gold); color: #000; font-family: 'Syne', sans-serif; font-weight: 800; font-size: .7rem; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.hero-step-arrow { color: var(--border2); font-size: .8rem; padding: 0 4px; }
+@media(max-width:600px) { .hero-step-arrow { display: none; } }
+
+/* ═══════════════════ FORM SECTION ═══════════════════ */
+.form-section { padding: 0 clamp(20px,5vw,72px) 80px; }
+.form-container { max-width: 760px; margin: 0 auto; }
+
+/* Progress bar */
+.progress-bar { display: flex; align-items: center; gap: 0; margin-bottom: 40px; position: relative; }
+.progress-bar::before { content: ''; position: absolute; top: 18px; left: 18px; right: 18px; height: 2px; background: var(--border); z-index: 0; }
+.progress-bar::after { content: ''; position: absolute; top: 18px; left: 18px; height: 2px; background: var(--gold); z-index: 1; transition: width .4s ease; }
+.progress-bar[data-step="1"]::after { width: 0%; }
+.progress-bar[data-step="2"]::after { width: 50%; }
+.progress-bar[data-step="3"]::after { width: 100%; }
+
+.prog-step { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 8px; position: relative; z-index: 2; }
+.prog-dot { width: 36px; height: 36px; border-radius: 50%; border: 2px solid var(--border); background: var(--bg); display: flex; align-items: center; justify-content: center; font-family: 'Syne', sans-serif; font-weight: 800; font-size: .78rem; color: var(--muted2); transition: all .3s; }
+.prog-dot.active { border-color: var(--gold); background: var(--gold); color: #000; }
+.prog-dot.done { border-color: var(--jade); background: rgba(61,255,160,.15); color: var(--jade); }
+.prog-label { font-size: .7rem; font-weight: 600; color: var(--muted); text-align: center; white-space: nowrap; }
+.prog-step.active .prog-label { color: var(--gold); }
+.prog-step.done .prog-label { color: var(--jade); }
+
+/* Cards */
+.form-card { background: var(--bg2); border: 1px solid var(--border); border-radius: 20px; padding: 32px; margin-bottom: 20px; display: none; }
+.form-card.active { display: block; animation: fadeIn .3s ease; }
+@keyframes fadeIn { from{opacity:0;transform:translateY(8px);} to{opacity:1;transform:translateY(0);} }
+
+.card-header { margin-bottom: 28px; }
+.card-step-label { font-size: .7rem; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--gold); margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+.card-step-label::before { content: ''; width: 20px; height: 2px; background: var(--gold); }
+.card-title { font-family: 'Syne', sans-serif; font-size: 1.4rem; font-weight: 800; letter-spacing: -.5px; }
+.card-desc { font-size: .88rem; color: var(--muted2); margin-top: 6px; }
+
+/* Form elements */
+.fg { margin-bottom: 18px; }
+.fg label { display: block; font-size: .78rem; font-weight: 600; color: var(--muted2); margin-bottom: 7px; letter-spacing: .2px; }
+.fg label span { color: var(--ember); margin-left: 2px; }
+.fg input, .fg select, .fg textarea {
+  width: 100%; background: var(--bg3); border: 1px solid var(--border2); border-radius: 12px;
+  color: var(--chalk); font-family: 'DM Sans', sans-serif; font-size: .92rem;
+  padding: 13px 16px; transition: border-color .18s, box-shadow .18s; outline: none;
+}
+.fg input:focus, .fg select:focus, .fg textarea:focus { border-color: var(--gold); box-shadow: 0 0 0 3px rgba(240,192,64,.1); }
+.fg input::placeholder, .fg textarea::placeholder { color: var(--muted); }
+.fg textarea { resize: vertical; min-height: 90px; }
+.fg select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' fill='none'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%235a6680' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 14px center; cursor: pointer; }
+.fg-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+@media(max-width:580px) { .fg-row { grid-template-columns: 1fr; } }
+.fg-hint { font-size: .74rem; color: var(--muted); margin-top: 6px; }
+.fg-hint.good { color: var(--jade); }
+.fg-error { font-size: .74rem; color: var(--ember); margin-top: 6px; display: none; }
+
+/* Categorie pills */
+.cat-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 8px; }
+.cat-pill { background: var(--bg3); border: 1.5px solid var(--border2); border-radius: 12px; padding: 12px 8px; text-align: center; cursor: pointer; transition: all .18s; }
+.cat-pill:hover { border-color: rgba(240,192,64,.4); background: var(--gold-d); }
+.cat-pill.selected { border-color: var(--gold); background: var(--gold-d); }
+.cat-pill .cp-emoji { font-size: 1.5rem; display: block; margin-bottom: 5px; }
+.cat-pill .cp-label { font-size: .72rem; font-weight: 600; color: var(--muted2); }
+.cat-pill.selected .cp-label { color: var(--gold); }
+
+/* Photo upload */
+.photo-drop { border: 2px dashed var(--border2); border-radius: 14px; padding: 32px 20px; text-align: center; cursor: pointer; transition: border-color .18s, background .18s; position: relative; }
+.photo-drop:hover, .photo-drop.over { border-color: rgba(240,192,64,.5); background: rgba(240,192,64,.04); }
+.photo-drop input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+.photo-drop-icon { font-size: 2.2rem; margin-bottom: 10px; }
+.photo-drop-text { font-size: .88rem; color: var(--muted2); }
+.photo-drop-hint { font-size: .74rem; color: var(--muted); margin-top: 5px; }
+.photo-previews { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 14px; }
+.photo-thumb { width: 80px; height: 80px; border-radius: 10px; object-fit: cover; border: 2px solid var(--border); position: relative; }
+.photo-thumb-wrap { position: relative; }
+.photo-thumb-wrap .rm-btn { position: absolute; top: -6px; right: -6px; width: 20px; height: 20px; border-radius: 50%; background: var(--ember); border: none; color: #fff; font-size: .6rem; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+
+/* WhatsApp toggle */
+.wa-toggle { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; }
+.wa-toggle input[type=checkbox] { width: 18px; height: 18px; cursor: pointer; }
+.wa-toggle label { font-size: .88rem; color: var(--muted2); cursor: pointer; }
+
+/* Hours table */
+.hours-grid { display: flex; flex-direction: column; gap: 8px; }
+.hours-row { display: flex; align-items: center; gap: 12px; }
+.hours-day { font-size: .82rem; font-weight: 600; min-width: 42px; }
+.hours-closed { font-size: .78rem; color: var(--muted); display: flex; align-items: center; gap: 6px; cursor: pointer; }
+.hours-times { display: flex; align-items: center; gap: 8px; flex: 1; }
+.hours-times input { background: var(--bg3); border: 1px solid var(--border2); border-radius: 8px; color: var(--chalk); font-size: .82rem; padding: 8px 10px; width: 88px; outline: none; transition: border-color .18s; }
+.hours-times input:focus { border-color: var(--gold); }
+.hours-sep { color: var(--muted); font-size: .78rem; }
+
+/* Nav buttons */
+.form-nav { display: flex; gap: 12px; margin-top: 28px; }
+.btn-next { flex: 1; background: var(--gold); color: #000; font-family: 'Syne', sans-serif; font-weight: 800; font-size: .95rem; padding: 15px; border-radius: 14px; border: none; cursor: pointer; transition: transform .15s, box-shadow .15s; display: flex; align-items: center; justify-content: center; gap: 8px; }
+.btn-next:hover { transform: translateY(-1px); box-shadow: 0 8px 28px rgba(240,192,64,.4); }
+.btn-back-form { background: transparent; border: 1px solid var(--border2); color: var(--muted2); font-family: 'Syne', sans-serif; font-weight: 600; font-size: .9rem; padding: 15px 24px; border-radius: 14px; cursor: pointer; transition: border-color .15s; }
+.btn-back-form:hover { border-color: var(--muted2); }
+
+/* Summary card */
+.summary-block { background: var(--bg3); border: 1px solid var(--border); border-radius: 14px; padding: 20px; margin-bottom: 14px; }
+.summary-row { display: flex; gap: 12px; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,.04); font-size: .86rem; }
+.summary-row:last-child { border-bottom: none; }
+.summary-label { color: var(--muted2); min-width: 120px; flex-shrink: 0; }
+.summary-val { color: var(--chalk); font-weight: 500; word-break: break-word; }
+
+/* Success screen */
+.success-screen { display: none; text-align: center; padding: 60px 20px; }
+.success-screen.show { display: block; animation: fadeIn .4s ease; }
+.success-icon { font-size: 4rem; margin-bottom: 20px; }
+.success-title { font-family: 'Syne', sans-serif; font-size: 2rem; font-weight: 800; letter-spacing: -1px; margin-bottom: 12px; }
+.success-title .gold { color: var(--gold); }
+.success-desc { font-size: .95rem; color: var(--muted2); max-width: 440px; margin: 0 auto 32px; line-height: 1.7; }
+.success-steps { display: flex; flex-direction: column; gap: 10px; max-width: 380px; margin: 0 auto 36px; text-align: left; }
+.success-step { display: flex; gap: 12px; align-items: flex-start; background: var(--bg2); border: 1px solid var(--border); border-radius: 12px; padding: 14px; }
+.success-step-icon { width: 36px; height: 36px; border-radius: 10px; background: var(--gold-d); border: 1px solid rgba(240,192,64,.2); display: flex; align-items: center; justify-content: center; font-size: 1.1rem; flex-shrink: 0; }
+.success-step-text strong { font-size: .88rem; font-family: 'Syne', sans-serif; display: block; margin-bottom: 3px; }
+.success-step-text span { font-size: .78rem; color: var(--muted2); }
+.btn-home { display: inline-flex; align-items: center; gap: 10px; background: var(--gold); color: #000; font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1rem; padding: 15px 30px; border-radius: 100px; transition: transform .15s, box-shadow .15s; }
+.btn-home:hover { transform: translateY(-2px); box-shadow: 0 10px 36px rgba(240,192,64,.4); }
+.btn-app { display: inline-flex; align-items: center; gap: 10px; background: transparent; border: 1px solid var(--border2); color: var(--chalk); font-size: .95rem; padding: 15px 28px; border-radius: 100px; transition: border-color .15s; margin-left: 10px; }
+.btn-app:hover { border-color: var(--muted2); }
+
+/* Benefits sidebar */
+.benefits { background: var(--bg2); border: 1px solid var(--border); border-radius: 20px; padding: 24px; margin-bottom: 24px; }
+.benefits-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: .88rem; color: var(--muted2); letter-spacing: .5px; text-transform: uppercase; margin-bottom: 16px; }
+.benefit-item { display: flex; gap: 12px; align-items: flex-start; margin-bottom: 14px; }
+.benefit-item:last-child { margin-bottom: 0; }
+.benefit-icon { width: 36px; height: 36px; border-radius: 10px; background: var(--gold-d); border: 1px solid rgba(240,192,64,.15); display: flex; align-items: center; justify-content: center; font-size: 1rem; flex-shrink: 0; }
+.benefit-text strong { font-size: .86rem; font-family: 'Syne', sans-serif; display: block; margin-bottom: 2px; }
+.benefit-text span { font-size: .78rem; color: var(--muted2); }
+
+/* Spinner */
+.spinner { width: 22px; height: 22px; border: 2px solid rgba(0,0,0,.2); border-top-color: #000; border-radius: 50%; animation: spin .7s linear infinite; display: none; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* Footer */
+.ns-footer-mini { padding: 28px clamp(20px,5vw,72px); border-top: 1px solid var(--border); text-align: center; }
+.ns-footer-mini-inner { max-width: 760px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+.ns-footer-logo { font-family: 'Syne', sans-serif; font-weight: 800; font-size: .95rem; }
+.ns-footer-logo .g { color: var(--gold); }
+.ns-footer-links { display: flex; gap: 16px; }
+.ns-footer-links a { font-size: .78rem; color: var(--muted); transition: color .15s; }
+.ns-footer-links a:hover { color: var(--chalk); }
+
+@media(max-width:480px) {
+  .form-card { padding: 20px 16px; }
+  .hours-row { flex-wrap: wrap; }
+  .hours-times { width: 100%; }
+}
+</style>
+</head>
+<body>
+
+<!-- ════ NAV ════ -->
+<nav class="ns-nav" id="nsNav">
+  <a href="landing.html" class="ns-logo"><span class="nsg">•</span>Near<span class="nsg">Shop</span>&nbsp;Drive</a>
+  <div class="ns-links">
+    <a href="landing.html" class="ns-link">Accueil</a>
+    <a href="landing.html#comment" class="ns-link">Comment ça marche</a>
+    <a href="landing.html#concept" class="ns-link">Le concept</a>
+    <a href="landing.html#fonctionnalites" class="ns-link">Fonctionnalités</a>
+    <a href="inscription.html" class="ns-link ns-active">Inscrire mon commerce</a>
+    <a href="legal.html" class="ns-link">Légal</a>
+  </div>
+  <div class="ns-nav-right">
+    <a href="app.html" class="ns-cta-btn">🗺️ Ouvrir la carte</a>
+    <button class="ns-burger" id="nsBurger" aria-label="Menu"><span></span><span></span><span></span></button>
+  </div>
+</nav>
+<div class="ns-drawer" id="nsDrawer">
+  <a href="landing.html" class="ns-link">Accueil</a>
+  <a href="landing.html#comment" class="ns-link">Comment ça marche</a>
+  <a href="landing.html#concept" class="ns-link">Le concept</a>
+  <a href="landing.html#fonctionnalites" class="ns-link">Fonctionnalités</a>
+  <a href="inscription.html" class="ns-link ns-active">Inscrire mon commerce</a>
+  <a href="legal.html" class="ns-link">Légal</a>
+  <a href="app.html" class="ns-cta-btn">🗺️ Ouvrir la carte</a>
+</div>
+
+<!-- ════ HERO ════ -->
+<div class="hero">
+  <div class="hero-grid"></div>
+  <div class="hero-badge"><span class="pulse-green"></span>Rejoignez NearShop Drive</div>
+  <h1 class="hero-title">Inscrivez votre commerce.<br>Livrez à la <span class="gold">voiture</span> de vos clients.</h1>
+  <p class="hero-desc">En 3 minutes, votre fiche est soumise. Sous <strong>24–48h</strong>, elle est vérifiée et publiée sur la carte. <strong>100% gratuit, zéro commission.</strong></p>
+  <div class="hero-steps">
+    <div class="hero-step"><span class="hs-num">1</span> Vos informations</div>
+    <div class="hero-step-arrow">→</div>
+    <div class="hero-step"><span class="hs-num">2</span> Horaires & photos</div>
+    <div class="hero-step-arrow">→</div>
+    <div class="hero-step"><span class="hs-num">3</span> Confirmation</div>
+  </div>
+</div>
+
+<!-- ════ FORM ════ -->
+<section class="form-section">
+  <div class="form-container">
+
+    <!-- Benefits -->
+    <div class="benefits">
+      <div class="benefits-title">Pourquoi rejoindre NearShop Drive ?</div>
+      <div class="benefit-item"><div class="benefit-icon">💸</div><div class="benefit-text"><strong>0% de commission</strong><span>Vous gardez 100% de vos ventes. Aucun frais caché.</span></div></div>
+      <div class="benefit-item"><div class="benefit-icon">🚗</div><div class="benefit-text"><strong>Clients qui viennent à vous</strong><span>Votre parking devient votre point de livraison.</span></div></div>
+      <div class="benefit-item"><div class="benefit-icon">💬</div><div class="benefit-text"><strong>Commandes via WhatsApp</strong><span>Pas d'app, pas de caisse connectée. Juste un message.</span></div></div>
+      <div class="benefit-item"><div class="benefit-icon">📍</div><div class="benefit-text"><strong>Visibilité locale gratuite</strong><span>Apparaissez sur la carte de tous les clients proches.</span></div></div>
+    </div>
+
+    <!-- Progress -->
+    <div class="progress-bar" id="progressBar" data-step="1">
+      <div class="prog-step active" id="ps1"><div class="prog-dot active" id="pd1">1</div><div class="prog-label">Informations</div></div>
+      <div class="prog-step" id="ps2"><div class="prog-dot" id="pd2">2</div><div class="prog-label">Horaires & photos</div></div>
+      <div class="prog-step" id="ps3"><div class="prog-dot" id="pd3">3</div><div class="prog-label">Confirmation</div></div>
+    </div>
+
+    <!-- ─── STEP 1 ─── -->
+    <div class="form-card active" id="step1">
+      <div class="card-header">
+        <div class="card-step-label">Étape 1 sur 3</div>
+        <div class="card-title">Informations du commerce</div>
+        <div class="card-desc">Ces informations apparaîtront sur votre fiche publique.</div>
+      </div>
+
+      <div class="fg">
+        <label>Nom du commerce <span>*</span></label>
+        <input type="text" id="f-name" placeholder="Ex: Épicerie Al Baraka, Boulangerie Samir…" autocomplete="organization">
+        <div class="fg-error" id="err-name">Le nom est obligatoire.</div>
+      </div>
+
+      <div class="fg">
+        <label>Catégorie <span>*</span></label>
+        <div class="cat-grid" id="catGrid">
+          <div class="cat-pill" data-cat="🛒 Épicerie"><span class="cp-emoji">🛒</span><span class="cp-label">Épicerie</span></div>
+          <div class="cat-pill" data-cat="🥖 Boulangerie"><span class="cp-emoji">🥖</span><span class="cp-label">Boulangerie</span></div>
+          <div class="cat-pill" data-cat="🥩 Boucherie"><span class="cp-emoji">🥩</span><span class="cp-label">Boucherie</span></div>
+          <div class="cat-pill" data-cat="🍕 Restaurant"><span class="cp-emoji">🍕</span><span class="cp-label">Restaurant</span></div>
+          <div class="cat-pill" data-cat="☕ Café"><span class="cp-emoji">☕</span><span class="cp-label">Café</span></div>
+          <div class="cat-pill" data-cat="🧁 Pâtisserie"><span class="cp-emoji">🧁</span><span class="cp-label">Pâtisserie</span></div>
+          <div class="cat-pill" data-cat="🌿 Herboristerie"><span class="cp-emoji">🌿</span><span class="cp-label">Herboristerie</span></div>
+          <div class="cat-pill" data-cat="💊 Pharmacie"><span class="cp-emoji">💊</span><span class="cp-label">Pharmacie</span></div>
+          <div class="cat-pill" data-cat="🌸 Fleuriste"><span class="cp-emoji">🌸</span><span class="cp-label">Fleuriste</span></div>
+          <div class="cat-pill" data-cat="📱 High-Tech"><span class="cp-emoji">📱</span><span class="cp-label">High-Tech</span></div>
+          <div class="cat-pill" data-cat="🧴 Cosmétiques"><span class="cp-emoji">🧴</span><span class="cp-label">Cosmétiques</span></div>
+          <div class="cat-pill" data-cat="🫖 Épices & Thés"><span class="cp-emoji">🫖</span><span class="cp-label">Épices & Thés</span></div>
+          <div class="cat-pill" data-cat="🏪 Autre"><span class="cp-emoji">🏪</span><span class="cp-label">Autre</span></div>
+        </div>
+        <div class="fg-error" id="err-cat">Veuillez sélectionner une catégorie.</div>
+      </div>
+
+      <div class="fg">
+        <label>Adresse complète <span>*</span></label>
+        <input type="text" id="f-address" placeholder="Rue, Numéro, Ville, Pays" autocomplete="street-address">
+        <div class="fg-hint">Ex: 12 Rue des Orangers, Agadir, Maroc</div>
+        <div class="fg-error" id="err-address">L'adresse est obligatoire.</div>
+      </div>
+
+      <div class="fg-row">
+        <div class="fg">
+          <label>Téléphone <span>*</span></label>
+          <input type="tel" id="f-phone" placeholder="+212 6 00 00 00 00" autocomplete="tel">
+          <div class="fg-error" id="err-phone">Le téléphone est obligatoire.</div>
+        </div>
+        <div class="fg">
+          <label>Email de contact <span>*</span></label>
+          <input type="email" id="f-email" placeholder="votre@email.com" autocomplete="email">
+          <div class="fg-error" id="err-email">L'email est obligatoire.</div>
+        </div>
+      </div>
+
+      <div class="fg">
+        <div class="wa-toggle">
+          <input type="checkbox" id="wa-same" checked onchange="toggleWa()">
+          <label for="wa-same">Même numéro pour WhatsApp</label>
+        </div>
+        <div id="wa-field" style="display:none;">
+          <label>Numéro WhatsApp <span>*</span> <span style="font-weight:400;color:var(--muted);font-size:.76rem">(format international)</span></label>
+          <input type="tel" id="f-whatsapp" placeholder="+212 6 00 00 00 00">
+          <div class="fg-hint">Ex: +212612345678 — sans espaces ni tirets</div>
+        </div>
+      </div>
+
+      <div class="fg">
+        <label>Description courte</label>
+        <textarea id="f-desc" placeholder="Décrivez votre commerce en quelques phrases : spécialités, ambiance, ce qui vous rend unique…"></textarea>
+        <div class="fg-hint"><span id="desc-count">0</span>/300 caractères</div>
+      </div>
+
+      <div class="form-nav">
+        <button class="btn-next" onclick="goStep2()">Continuer → Horaires & photos</button>
+      </div>
+    </div>
+
+    <!-- ─── STEP 2 ─── -->
+    <div class="form-card" id="step2">
+      <div class="card-header">
+        <div class="card-step-label">Étape 2 sur 3</div>
+        <div class="card-title">Horaires & photos</div>
+        <div class="card-desc">Indiquez vos horaires d'ouverture et ajoutez des photos de votre commerce.</div>
+      </div>
+
+      <div class="fg">
+        <label>Statut actuel</label>
+        <select id="f-status">
+          <option value="open">🟢 Ouvert en ce moment</option>
+          <option value="closed">🔴 Fermé en ce moment</option>
+        </select>
+      </div>
+
+      <div class="fg">
+        <label>Horaires d'ouverture</label>
+        <div class="hours-grid" id="hoursGrid">
+          <!-- Generated by JS -->
+        </div>
+        <div class="fg-hint" style="margin-top:10px">Cochez "Fermé" pour les jours de congé.</div>
+      </div>
+
+      <div class="fg" style="margin-top:24px;">
+        <label>Photos du commerce <span style="font-weight:400;color:var(--muted);font-size:.76rem">(optionnel — max 3)</span></label>
+        <div class="photo-drop" id="photoDrop">
+          <input type="file" id="photoInput" accept="image/*" multiple>
+          <div class="photo-drop-icon">📷</div>
+          <div class="photo-drop-text">Glissez vos photos ici ou <strong style="color:var(--gold)">cliquez pour sélectionner</strong></div>
+          <div class="photo-drop-hint">JPG, PNG · Max 5 Mo par photo · Max 3 photos</div>
+        </div>
+        <div class="photo-previews" id="photoPreviews"></div>
+      </div>
+
+      <div class="form-nav">
+        <button class="btn-back-form" onclick="goStep(1)">← Retour</button>
+        <button class="btn-next" onclick="goStep3()">Continuer → Vérifier</button>
+      </div>
+    </div>
+
+    <!-- ─── STEP 3 ─── -->
+    <div class="form-card" id="step3">
+      <div class="card-header">
+        <div class="card-step-label">Étape 3 sur 3</div>
+        <div class="card-title">Vérifiez et envoyez</div>
+        <div class="card-desc">Relisez vos informations avant de soumettre votre demande.</div>
+      </div>
+
+      <div class="summary-block" id="summaryBlock">
+        <!-- Filled by JS -->
+      </div>
+
+      <div style="background:rgba(240,192,64,.06);border:1px solid rgba(240,192,64,.2);border-radius:14px;padding:16px;margin-bottom:20px;">
+        <div style="font-size:.8rem;color:var(--gold);font-weight:700;margin-bottom:6px;">ℹ️ Ce qui se passe ensuite</div>
+        <div style="font-size:.82rem;color:var(--muted2);line-height:1.65;">Votre demande sera examinée par notre équipe sous <strong style="color:var(--chalk)">24 à 48 heures</strong>. Une fois validée, votre commerce apparaît sur la carte NearShop Drive. Vous serez notifié par email.</div>
+      </div>
+
+      <div class="fg">
+        <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;font-size:.85rem;color:var(--muted2);">
+          <input type="checkbox" id="acceptCgu" style="width:18px;height:18px;flex-shrink:0;margin-top:2px;cursor:pointer;">
+          J'accepte les <a href="legal.html#cgu" target="_blank" style="color:var(--gold)">Conditions générales d'utilisation</a> et la <a href="legal.html#confidentialite" target="_blank" style="color:var(--gold)">Politique de confidentialité</a> de NearShop Drive.
+        </label>
+        <div class="fg-error" id="err-cgu">Vous devez accepter les CGU pour continuer.</div>
+      </div>
+
+      <div class="form-nav">
+        <button class="btn-back-form" onclick="goStep(2)">← Retour</button>
+        <button class="btn-next" id="submitBtn" onclick="submitForm()">
+          <span id="submitLabel">✅ Soumettre ma demande</span>
+          <div class="spinner" id="submitSpinner"></div>
+        </button>
+      </div>
+    </div>
+
+    <!-- ─── SUCCESS ─── -->
+    <div class="success-screen" id="successScreen">
+      <div class="success-icon">🎉</div>
+      <h2 class="success-title">Demande envoyée<br>avec <span class="gold">succès !</span></h2>
+      <p class="success-desc">Votre commerce a été soumis à notre équipe. Voici ce qui se passe maintenant :</p>
+      <div class="success-steps">
+        <div class="success-step"><div class="success-step-icon">📋</div><div class="success-step-text"><strong>Vérification en cours</strong><span>Nous examinons votre fiche sous 24–48h.</span></div></div>
+        <div class="success-step"><div class="success-step-icon">✅</div><div class="success-step-text"><strong>Publication sur la carte</strong><span>Une fois validé, votre commerce est visible par tous.</span></div></div>
+        <div class="success-step"><div class="success-step-icon">📧</div><div class="success-step-text"><strong>Notification par email</strong><span>Vous recevrez un email de confirmation à l'adresse fournie.</span></div></div>
+      </div>
+      <div>
+        <a href="landing.html" class="btn-home">🏠 Retour à l'accueil</a>
+        <a href="app.html" class="btn-app">🗺️ Voir la carte</a>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ════ FOOTER ════ -->
+<footer class="ns-footer-mini">
+  <div class="ns-footer-mini-inner">
+    <div class="ns-footer-logo"><span class="g">•</span>Near<span class="g">Shop</span>&nbsp;Drive</div>
+    <div class="ns-footer-links">
+      <a href="legal.html">Mentions légales</a>
+      <a href="legal.html#confidentialite">Confidentialité</a>
+      <a href="legal.html#cgu">CGU</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+/* ══ NAV ══ */
+const nsNav = document.getElementById('nsNav');
+window.addEventListener('scroll', () => nsNav.classList.toggle('solid', window.scrollY > 30), { passive: true });
+const burger = document.getElementById('nsBurger'), drawer = document.getElementById('nsDrawer');
+burger.addEventListener('click', () => { burger.classList.toggle('open'); drawer.classList.toggle('open'); });
+drawer.querySelectorAll('a').forEach(a => a.addEventListener('click', () => { burger.classList.remove('open'); drawer.classList.remove('open'); }));
+
+/* ══ APPS SCRIPT URL ══ */
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbypNx2Wqiah4EgFHPjeozHw25d3JAQW3e4ARse0zOcALaI3gn86pPmdj-2sJFF_ljQVSg/exec';
+
+/* ══ CATEGORY PILLS ══ */
+let selectedCat = '';
+document.querySelectorAll('.cat-pill').forEach(pill => {
+  pill.addEventListener('click', () => {
+    document.querySelectorAll('.cat-pill').forEach(p => p.classList.remove('selected'));
+    pill.classList.add('selected');
+    selectedCat = pill.dataset.cat;
+    document.getElementById('err-cat').style.display = 'none';
+  });
+});
+
+/* ══ SAME WHATSAPP TOGGLE ══ */
+function toggleWa() {
+  const same = document.getElementById('wa-same').checked;
+  document.getElementById('wa-field').style.display = same ? 'none' : 'block';
+}
+
+/* ══ DESC COUNTER ══ */
+const descEl = document.getElementById('f-desc');
+descEl.addEventListener('input', () => {
+  const n = descEl.value.length;
+  document.getElementById('desc-count').textContent = Math.min(n, 300);
+  if (n > 300) descEl.value = descEl.value.slice(0, 300);
+});
+
+/* ══ HOURS GRID ══ */
+const DAYS = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
+const hoursData = DAYS.map(d => ({ day: d, closed: false, open: '08:00', close: '19:00' }));
+function renderHours() {
+  const grid = document.getElementById('hoursGrid');
+  grid.innerHTML = hoursData.map((d, i) => `
+    <div class="hours-row">
+      <span class="hours-day">${d.day}</span>
+      <label class="hours-closed">
+        <input type="checkbox" ${d.closed ? 'checked' : ''} onchange="hoursData[${i}].closed=this.checked;renderHours()">
+        Fermé
+      </label>
+      ${!d.closed ? `
+      <div class="hours-times">
+        <input type="time" value="${d.open}" onchange="hoursData[${i}].open=this.value">
+        <span class="hours-sep">→</span>
+        <input type="time" value="${d.close}" onchange="hoursData[${i}].close=this.value">
+      </div>` : ''}
+    </div>
+  `).join('');
+}
+renderHours();
+
+/* ══ PHOTO UPLOAD ══ */
+const MAX_PHOTOS = 3;
+let selectedPhotos = [];
+const photoDrop = document.getElementById('photoDrop');
+const photoInput = document.getElementById('photoInput');
+
+photoInput.addEventListener('change', () => addPhotos(photoInput.files));
+photoDrop.addEventListener('dragover', e => { e.preventDefault(); photoDrop.classList.add('over'); });
+photoDrop.addEventListener('dragleave', () => photoDrop.classList.remove('over'));
+photoDrop.addEventListener('drop', e => { e.preventDefault(); photoDrop.classList.remove('over'); addPhotos(e.dataTransfer.files); });
+
+function addPhotos(files) {
+  Array.from(files).forEach(f => {
+    if (selectedPhotos.length >= MAX_PHOTOS) return;
+    if (f.size > 5 * 1024 * 1024) return;
+    if (!f.type.startsWith('image/')) return;
+    selectedPhotos.push(f);
+  });
+  renderPhotos();
+}
+function renderPhotos() {
+  const container = document.getElementById('photoPreviews');
+  container.innerHTML = '';
+  selectedPhotos.forEach((f, i) => {
+    const url = URL.createObjectURL(f);
+    const wrap = document.createElement('div');
+    wrap.className = 'photo-thumb-wrap';
+    wrap.innerHTML = `<img src="${url}" class="photo-thumb"><button class="rm-btn" onclick="removePhoto(${i})">✕</button>`;
+    container.appendChild(wrap);
+  });
+  if (selectedPhotos.length >= MAX_PHOTOS) photoDrop.style.opacity = '.4';
+  else photoDrop.style.opacity = '1';
+}
+function removePhoto(i) {
+  selectedPhotos.splice(i, 1);
+  renderPhotos();
+}
+
+/* ══ PROGRESS ══ */
+function setProgress(step) {
+  document.getElementById('progressBar').dataset.step = step;
+  [1, 2, 3].forEach(i => {
+    const dot = document.getElementById('pd' + i);
+    const ps = document.getElementById('ps' + i);
+    dot.classList.remove('active', 'done');
+    ps.classList.remove('active', 'done');
+    if (i < step) { dot.classList.add('done'); ps.classList.add('done'); dot.textContent = '✓'; }
+    else if (i === step) { dot.classList.add('active'); ps.classList.add('active'); dot.textContent = i; }
+    else { dot.textContent = i; }
+  });
+  [1, 2, 3].forEach(i => {
+    document.getElementById('step' + i).classList.toggle('active', i === step);
+  });
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+/* ══ VALIDATION STEP 1 ══ */
+function goStep2() {
+  let ok = true;
+  const name = document.getElementById('f-name').value.trim();
+  const addr = document.getElementById('f-address').value.trim();
+  const phone = document.getElementById('f-phone').value.trim();
+  const email = document.getElementById('f-email').value.trim();
+
+  if (!name) { show('err-name'); ok = false; } else hide('err-name');
+  if (!selectedCat) { show('err-cat'); ok = false; } else hide('err-cat');
+  if (!addr) { show('err-address'); ok = false; } else hide('err-address');
+  if (!phone) { show('err-phone'); ok = false; } else hide('err-phone');
+  if (!email || !email.includes('@')) { show('err-email'); ok = false; } else hide('err-email');
+
+  if (!ok) { document.querySelector('.fg-error[style="display: block;"]')?.scrollIntoView({ behavior: 'smooth', block: 'center' }); return; }
+  setProgress(2);
+}
+
+function goStep3() {
+  buildSummary();
+  setProgress(3);
+}
+
+function goStep(n) { setProgress(n); }
+
+function show(id) { document.getElementById(id).style.display = 'block'; }
+function hide(id) { document.getElementById(id).style.display = 'none'; }
+
+/* ══ BUILD SUMMARY ══ */
+function buildSummary() {
+  const waNum = document.getElementById('wa-same').checked
+    ? document.getElementById('f-phone').value.trim()
+    : document.getElementById('f-whatsapp').value.trim();
+
+  const hoursStr = hoursData.map(d => d.closed ? `${d.day}: Fermé` : `${d.day}: ${d.open}–${d.close}`).join(' · ');
+
+  const rows = [
+    ['Commerce', document.getElementById('f-name').value.trim()],
+    ['Catégorie', selectedCat],
+    ['Adresse', document.getElementById('f-address').value.trim()],
+    ['Téléphone', document.getElementById('f-phone').value.trim()],
+    ['WhatsApp', waNum],
+    ['Email', document.getElementById('f-email').value.trim()],
+    ['Statut', document.getElementById('f-status').value === 'open' ? '🟢 Ouvert' : '🔴 Fermé'],
+    ['Horaires', hoursStr],
+    ['Photos', selectedPhotos.length ? `${selectedPhotos.length} photo(s) sélectionnée(s)` : 'Aucune'],
+    ['Description', document.getElementById('f-desc').value.trim() || '—'],
+  ];
+  document.getElementById('summaryBlock').innerHTML = rows.map(([l, v]) => `
+    <div class="summary-row"><span class="summary-label">${l}</span><span class="summary-val">${v}</span></div>
+  `).join('');
+}
+
+/* ══ SUBMIT ══ */
+async function submitForm() {
+  if (!document.getElementById('acceptCgu').checked) {
+    show('err-cgu'); return;
+  }
+  hide('err-cgu');
+
+  const submitBtn = document.getElementById('submitBtn');
+  const label = document.getElementById('submitLabel');
+  const spinner = document.getElementById('submitSpinner');
+
+  submitBtn.disabled = true;
+  label.style.display = 'none';
+  spinner.style.display = 'block';
+
+  const waNum = document.getElementById('wa-same').checked
+    ? document.getElementById('f-phone').value.trim()
+    : document.getElementById('f-whatsapp').value.trim();
+
+  const hoursStr = hoursData
+    .map(d => d.closed ? `${d.day}: Fermé` : `${d.day}: ${d.open}–${d.close}`)
+    .join(' | ');
+
+  const payload = {
+    secret: 'nearshop_sheet_2026',
+    action: 'addStore',
+    name:    document.getElementById('f-name').value.trim(),
+    cat:     selectedCat,
+    address: document.getElementById('f-address').value.trim(),
+    phone:   document.getElementById('f-phone').value.trim(),
+    whatsapp: waNum,
+    email:   document.getElementById('f-email').value.trim(),
+    hours:   hoursStr,
+    desc:    document.getElementById('f-desc').value.trim(),
+    status:  document.getElementById('f-status').value,
+    source:  'inscription_page',
+  };
+
+  try {
+    await fetch(SCRIPT_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+    // no-cors means we can't read response — assume success
+    showSuccess();
+  } catch (e) {
+    // Fallback: mailto
+    const subject = encodeURIComponent(`[NearShop Drive] Nouvelle inscription — ${payload.name}`);
+    const body = encodeURIComponent(
+      `Nom: ${payload.name}\nCatégorie: ${payload.cat}\nAdresse: ${payload.address}\nTéléphone: ${payload.phone}\nWhatsApp: ${payload.whatsapp}\nEmail: ${payload.email}\nHoraires: ${payload.hours}\nDescription: ${payload.desc}`
+    );
+    window.location.href = `mailto:nearshopdrive@gmail.com?subject=${subject}&body=${body}`;
+    showSuccess();
+  }
+}
+
+function showSuccess() {
+  document.getElementById('progressBar').style.display = 'none';
+  document.getElementById('step3').style.display = 'none';
+  document.getElementById('successScreen').classList.add('show');
+}
+</script>
+</body>
+</html>
