@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NearShop Drive — Livraison à votre véhicule</title>
+<meta name="description" content="Les commerces locaux livrent directement à votre voiture. Localisez, commandez via WhatsApp, restez dans votre véhicule.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,700;1,9..40,300&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ink:    #090b10;
+  --ink2:   #10131b;
+  --ink3:   #171b26;
+  --gold:   #f5c430;
+  --gold2:  rgba(245,196,48,.12);
+  --ember:  #ff6b35;
+  --jade:   #00e096;
+  --chalk:  #ede9e2;
+  --smoke:  #7c8494;
+  --ghost:  #252b3b;
+  --r:      14px;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{font-family:'DM Sans',sans-serif;background:var(--ink);color:var(--chalk);overflow-x:hidden;-webkit-tap-highlight-color:transparent;}
+a{text-decoration:none;color:inherit;}
+
+/* ── NAV ── */
+.nav{position:fixed;top:0;left:0;right:0;z-index:300;height:62px;display:flex;align-items:center;justify-content:space-between;padding:0 clamp(20px,4vw,56px);transition:background .35s,border .35s;}
+.nav.solid{background:rgba(9,11,16,.9);border-bottom:1px solid rgba(255,255,255,.06);backdrop-filter:blur(18px);}
+.nav-logo{font-family:'Syne',sans-serif;font-weight:800;font-size:1.1rem;letter-spacing:-.3px;display:flex;align-items:center;gap:3px;}
+.nav-logo .g{color:var(--gold);}
+.nav-cta{background:var(--gold);color:var(--ink);font-weight:700;font-size:.82rem;padding:9px 20px;border-radius:100px;transition:transform .15s,box-shadow .15s;font-family:'Syne',sans-serif;}
+.nav-cta:hover{transform:translateY(-1px);box-shadow:0 6px 22px rgba(245,196,48,.38);}
+
+/* ── HERO ── */
+.hero{
+  min-height:100svh;
+  display:flex;align-items:center;
+  padding:80px clamp(20px,5vw,72px) 40px;
+  position:relative;overflow:hidden;
+}
+
+/* Animated road lines background */
+.road-bg{
+  position:absolute;inset:0;pointer-events:none;
+  background:
+    repeating-linear-gradient(
+      90deg,
+      transparent 0px,
+      transparent 58px,
+      rgba(245,196,48,.04) 58px,
+      rgba(245,196,48,.04) 60px
+    );
+  mask-image:radial-gradient(ellipse 90% 80% at 50% 100%,black 20%,transparent 75%);
+}
+/* Moving dashes */
+.road-dashes{
+  position:absolute;bottom:0;left:0;right:0;height:3px;
+  background:repeating-linear-gradient(90deg,var(--gold) 0,var(--gold) 40px,transparent 40px,transparent 80px);
+  opacity:.15;
+  animation:dash 3s linear infinite;
+}
+@keyframes dash{from{background-position:0 0;}to{background-position:80px 0;}}
+
+/* Big glow */
+.hero-glow{
+  position:absolute;right:-15%;top:5%;
+  width:65vw;height:65vw;max-width:700px;max-height:700px;
+  border-radius:50%;
+  background:radial-gradient(ellipse,rgba(245,196,48,.09) 0%,transparent 65%);
+  pointer-events:none;
+  animation:breathe 7s ease-in-out infinite;
+}
+@keyframes breathe{0%,100%{transform:scale(1);}50%{transform:scale(1.06);}}
+
+.hero-inner{
+  max-width:1200px;margin:0 auto;width:100%;
+  display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:center;
+  position:relative;z-index:1;
+}
+@media(max-width:860px){
+  .hero-inner{grid-template-columns:1fr;gap:40px;text-align:center;}
+  .hero-visual{display:none;}
+}
+
+/* Badge */
+.hero-badge{
+  display:inline-flex;align-items:center;gap:8px;
+  background:rgba(245,196,48,.1);border:1px solid rgba(245,196,48,.25);
+  color:var(--gold);border-radius:100px;padding:6px 16px;
+  font-size:.72rem;font-weight:700;letter-spacing:.6px;text-transform:uppercase;
+  margin-bottom:22px;
+  opacity:0;animation:fadeUp .5s .1s forwards;
+}
+.pulse{width:8px;height:8px;border-radius:50%;background:var(--gold);animation:pulse 1.8s ease-in-out infinite;}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(245,196,48,.5);}50%{box-shadow:0 0 0 6px rgba(245,196,48,0);}}
+
+.hero-title{
+  font-family:'Syne',sans-serif;
+  font-size:clamp(2.6rem,5.5vw,4.4rem);
+  font-weight:800;letter-spacing:-2px;line-height:1.05;
+  margin-bottom:22px;
+  opacity:0;animation:fadeUp .5s .22s forwards;
+}
+.hero-title em{font-style:normal;color:var(--gold);}
+.hero-title .car{display:inline-block;animation:carBounce 2s ease-in-out infinite;}
+@keyframes carBounce{0%,100%{transform:translateY(0);}50%{transform:translateY(-4px);}}
+
+.hero-desc{
+  font-size:clamp(1rem,1.8vw,1.15rem);
+  font-weight:300;color:var(--smoke);
+  line-height:1.7;max-width:500px;margin-bottom:36px;
+  opacity:0;animation:fadeUp .5s .34s forwards;
+}
+@media(max-width:860px){.hero-desc{margin:0 auto 32px;}}
+.hero-desc strong{color:var(--chalk);font-weight:500;}
+
+.hero-btns{
+  display:flex;gap:12px;flex-wrap:wrap;
+  opacity:0;animation:fadeUp .5s .46s forwards;
+}
+@media(max-width:860px){.hero-btns{justify-content:center;}}
+
+.btn-gold{
+  display:inline-flex;align-items:center;gap:10px;
+  background:var(--gold);color:var(--ink);
+  font-family:'Syne',sans-serif;font-weight:800;font-size:1rem;
+  padding:16px 32px;border-radius:100px;
+  box-shadow:0 4px 22px rgba(245,196,48,.32);
+  transition:transform .18s,box-shadow .18s;
+}
+.btn-gold:hover{transform:translateY(-2px);box-shadow:0 10px 36px rgba(245,196,48,.48);}
+.btn-outline{
+  display:inline-flex;align-items:center;gap:8px;
+  border:1px solid var(--ghost);color:var(--chalk);
+  font-size:.95rem;font-weight:500;
+  padding:16px 28px;border-radius:100px;
+  transition:border-color .18s,background .18s;
+}
+.btn-outline:hover{border-color:var(--smoke);background:rgba(255,255,255,.04);}
+
+.hero-trust{
+  display:flex;align-items:center;gap:14px;flex-wrap:wrap;
+  margin-top:18px;
+  opacity:0;animation:fadeUp .5s .58s forwards;
+  font-size:.78rem;color:var(--smoke);
+}
+@media(max-width:860px){.hero-trust{justify-content:center;}}
+.trust-item{display:flex;align-items:center;gap:5px;}
+.trust-item::before{content:'✓';color:var(--jade);font-weight:700;}
+.trust-sep{color:var(--ghost);}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);}}
+
+/* ── HERO VISUAL — CAR + PHONE ── */
+.hero-visual{position:relative;display:flex;align-items:center;justify-content:center;height:480px;}
+
+/* Car SVG container */
+.car-scene{
+  position:relative;
+  display:flex;flex-direction:column;align-items:center;
+}
+.car-svg{
+  width:320px;
+  filter:drop-shadow(0 20px 40px rgba(0,0,0,.6)) drop-shadow(0 0 60px rgba(245,196,48,.08));
+  animation:carFloat 4s ease-in-out infinite;
+}
+@keyframes carFloat{0%,100%{transform:translateY(0);}50%{transform:translateY(-8px);}}
+
+/* Road under car */
+.road-strip{
+  width:380px;height:6px;border-radius:3px;
+  background:linear-gradient(90deg,transparent,var(--ghost),var(--ghost),transparent);
+  margin-top:-8px;position:relative;
+}
+.road-strip::after{
+  content:'';
+  position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+  width:60px;height:2px;
+  background:var(--gold);opacity:.4;border-radius:1px;
+}
+
+/* Floating notification — WhatsApp */
+.notif-wa{
+  position:absolute;top:10%;right:-5%;
+  background:var(--ink2);border:1px solid rgba(255,255,255,.1);
+  border-radius:16px;padding:14px 16px;
+  display:flex;align-items:center;gap:12px;
+  box-shadow:0 8px 32px rgba(0,0,0,.5);
+  min-width:230px;
+  animation:notifFloat 4s ease-in-out infinite;
+}
+@keyframes notifFloat{0%,100%{transform:translateY(0) rotate(1deg);}50%{transform:translateY(-8px) rotate(1deg);}}
+.notif-icon{width:38px;height:38px;border-radius:10px;background:rgba(0,224,150,.15);display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0;}
+.notif-text .nt-title{font-size:.75rem;font-weight:700;color:var(--chalk);margin-bottom:2px;}
+.notif-text .nt-msg{font-size:.7rem;color:var(--smoke);}
+.notif-dot{width:8px;height:8px;border-radius:50%;background:var(--jade);flex-shrink:0;align-self:flex-start;margin-top:4px;box-shadow:0 0 6px var(--jade);}
+
+/* Floating distance chip */
+.chip-dist{
+  position:absolute;bottom:28%;left:-8%;
+  background:var(--ink2);border:1px solid rgba(245,196,48,.2);
+  border-radius:100px;padding:8px 16px;
+  font-size:.75rem;font-weight:600;color:var(--gold);
+  display:flex;align-items:center;gap:6px;
+  box-shadow:0 4px 16px rgba(0,0,0,.4);
+  animation:notifFloat2 3.5s ease-in-out infinite;
+}
+@keyframes notifFloat2{0%,100%{transform:translateY(0);}50%{transform:translateY(-6px);}}
+
+/* Status chip */
+.chip-status{
+  position:absolute;top:32%;left:-12%;
+  background:var(--ink2);border:1px solid rgba(0,224,150,.2);
+  border-radius:100px;padding:8px 14px;
+  font-size:.72rem;font-weight:600;color:var(--jade);
+  display:flex;align-items:center;gap:6px;
+  box-shadow:0 4px 16px rgba(0,0,0,.4);
+  animation:notifFloat2 4.5s .5s ease-in-out infinite;
+}
+
+/* ── STEPS ── */
+.steps-section{
+  padding:80px clamp(20px,5vw,72px);
+  max-width:1200px;margin:0 auto;
+}
+.sec-eyebrow{
+  font-size:.72rem;font-weight:700;color:var(--gold);
+  letter-spacing:1.5px;text-transform:uppercase;
+  display:flex;align-items:center;gap:10px;margin-bottom:14px;
+}
+.sec-eyebrow::before{content:'';width:28px;height:2px;background:var(--gold);border-radius:2px;}
+.sec-h{
+  font-family:'Syne',sans-serif;
+  font-size:clamp(1.9rem,4vw,3rem);
+  font-weight:800;letter-spacing:-1px;line-height:1.1;
+  margin-bottom:14px;
+}
+.sec-sub{font-size:.95rem;color:var(--smoke);max-width:500px;line-height:1.65;margin-bottom:52px;}
+
+.steps-grid{
+  display:grid;grid-template-columns:repeat(3,1fr);
+  gap:2px;border-radius:20px;overflow:hidden;
+  background:var(--ghost);border:1px solid var(--ghost);
+}
+@media(max-width:760px){.steps-grid{grid-template-columns:1fr;}}
+
+.step-card{
+  background:var(--ink2);
+  padding:36px 30px;
+  position:relative;
+  transition:background .2s;
+}
+.step-card:hover{background:var(--ink3);}
+.step-num-tag{
+  display:inline-flex;
+  background:var(--gold2);border:1px solid rgba(245,196,48,.2);
+  color:var(--gold);border-radius:100px;
+  padding:3px 12px;font-size:.68rem;font-weight:700;
+  letter-spacing:.5px;margin-bottom:22px;
+}
+.step-emoji{font-size:2.6rem;display:block;margin-bottom:18px;}
+.step-title{font-family:'Syne',sans-serif;font-size:1.1rem;font-weight:800;margin-bottom:10px;}
+.step-desc{font-size:.875rem;color:var(--smoke);line-height:1.65;}
+.step-desc strong{color:var(--chalk);font-weight:500;}
+
+/* Arrow connectors */
+.step-card:not(:last-child)::after{
+  content:'→';
+  position:absolute;top:50%;right:-14px;
+  font-size:1.2rem;color:rgba(245,196,48,.35);
+  transform:translateY(-50%);z-index:2;
+  display:none;
+}
+@media(min-width:760px){.step-card:not(:last-child)::after{display:block;}}
+
+/* ── PROMISE BANNER ── */
+.promise{
+  margin:0 clamp(20px,5vw,72px) 0;
+  background:linear-gradient(115deg,#1a1500 0%,#0f1108 50%,#0a0c14 100%);
+  border:1px solid rgba(245,196,48,.2);
+  border-radius:24px;
+  padding:clamp(36px,5vw,64px);
+  display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:center;
+  position:relative;overflow:hidden;
+}
+@media(max-width:700px){.promise{grid-template-columns:1fr;gap:32px;}}
+.promise::before{
+  content:'';position:absolute;left:-60px;top:-60px;
+  width:280px;height:280px;border-radius:50%;
+  background:radial-gradient(ellipse,rgba(245,196,48,.1),transparent 70%);
+  pointer-events:none;
+}
+.promise-quote{
+  font-family:'Syne',sans-serif;
+  font-size:clamp(1.3rem,2.8vw,1.9rem);
+  font-weight:800;letter-spacing:-.5px;line-height:1.3;
+}
+.promise-quote em{font-style:normal;color:var(--gold);}
+.promise-sub{margin-top:16px;font-size:.9rem;color:var(--smoke);line-height:1.65;}
+.promise-sub strong{color:var(--chalk);}
+.promise-checklist{display:flex;flex-direction:column;gap:14px;}
+.pcheck{
+  display:flex;align-items:flex-start;gap:14px;
+  background:rgba(255,255,255,.03);
+  border:1px solid rgba(255,255,255,.06);
+  border-radius:14px;padding:16px 18px;
+  transition:border-color .2s;
+}
+.pcheck:hover{border-color:rgba(245,196,48,.2);}
+.pcheck-icon{
+  width:40px;height:40px;border-radius:10px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;font-size:1.2rem;
+}
+.pcheck-icon.y{background:rgba(245,196,48,.12);}
+.pcheck-icon.g{background:rgba(0,224,150,.1);}
+.pcheck-icon.e{background:rgba(255,107,53,.1);}
+.pcheck-title{font-size:.9rem;font-weight:600;color:var(--chalk);margin-bottom:3px;}
+.pcheck-desc{font-size:.78rem;color:var(--smoke);line-height:1.5;}
+
+/* ── CATEGORIES ── */
+.cats-section{padding:80px clamp(20px,5vw,72px);}
+.cats-section .inner{max-width:1200px;margin:0 auto;}
+.cats-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(130px,1fr));
+  gap:10px;
+  margin-top:0;
+}
+.cat-card{
+  background:var(--ink2);border:1px solid var(--ghost);border-radius:16px;
+  padding:20px 14px;text-align:center;
+  transition:border-color .18s,background .18s,transform .18s;
+  cursor:default;
+}
+.cat-card:hover{border-color:rgba(245,196,48,.35);background:var(--gold2);transform:translateY(-3px);}
+.cat-emoji{font-size:2rem;display:block;margin-bottom:8px;}
+.cat-name{font-size:.78rem;font-weight:600;color:var(--smoke);}
+.cat-card:hover .cat-name{color:var(--chalk);}
+
+/* ── HOW DRIVE ── */
+.drive-section{
+  padding:0 clamp(20px,5vw,72px) 80px;
+  max-width:1200px;margin:0 auto;
+}
+.drive-cards{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;}
+@media(max-width:640px){.drive-cards{grid-template-columns:1fr;}}
+.drive-card{
+  background:var(--ink2);border:1px solid var(--ghost);border-radius:20px;
+  padding:28px;
+  transition:border-color .2s,transform .2s;
+  position:relative;overflow:hidden;
+}
+.drive-card::before{
+  content:'';position:absolute;inset:0;opacity:0;
+  background:radial-gradient(ellipse 80% 60% at 50% 0%,rgba(245,196,48,.06),transparent);
+  transition:opacity .3s;
+}
+.drive-card:hover{border-color:rgba(245,196,48,.25);transform:translateY(-3px);}
+.drive-card:hover::before{opacity:1;}
+.dc-num{
+  font-family:'Syne',sans-serif;font-size:3rem;font-weight:800;
+  color:rgba(245,196,48,.1);line-height:1;margin-bottom:12px;
+}
+.dc-icon{font-size:1.8rem;margin-bottom:12px;display:block;}
+.dc-title{font-family:'Syne',sans-serif;font-size:1rem;font-weight:700;margin-bottom:8px;}
+.dc-desc{font-size:.85rem;color:var(--smoke);line-height:1.6;}
+.dc-tag{
+  display:inline-flex;margin-top:14px;
+  padding:3px 12px;border-radius:100px;
+  font-size:.68rem;font-weight:700;
+  background:var(--gold2);color:var(--gold);
+  border:1px solid rgba(245,196,48,.18);
+}
+
+/* ── CTA FINAL ── */
+.cta-final{
+  padding:80px clamp(20px,5vw,72px);
+  text-align:center;position:relative;overflow:hidden;
+}
+.cta-final::before{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse 60% 70% at 50% 100%,rgba(245,196,48,.07),transparent 65%);
+  pointer-events:none;
+}
+.cta-final-title{
+  font-family:'Syne',sans-serif;
+  font-size:clamp(2.2rem,5vw,3.8rem);
+  font-weight:800;letter-spacing:-1.5px;line-height:1.1;
+  margin-bottom:18px;
+}
+.cta-final-title em{font-style:normal;color:var(--gold);}
+.cta-final-sub{
+  font-size:1rem;color:var(--smoke);max-width:440px;
+  margin:0 auto 36px;line-height:1.65;
+}
+.cta-btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-bottom:28px;}
+.cta-trust{display:flex;gap:18px;justify-content:center;flex-wrap:wrap;}
+.cta-trust span{font-size:.78rem;color:var(--smoke);display:flex;align-items:center;gap:5px;}
+.cta-trust span::before{content:'✓';color:var(--jade);font-weight:700;}
+
+/* ── FOOTER ── */
+footer{
+  background:var(--ink2);border-top:1px solid rgba(255,255,255,.05);
+  padding:28px clamp(20px,5vw,72px);
+}
+.foot-inner{max-width:1200px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:14px;}
+.foot-logo{font-family:'Syne',sans-serif;font-weight:800;font-size:1rem;letter-spacing:-.3px;}
+.foot-logo .g{color:var(--gold);}
+.foot-links{display:flex;gap:18px;flex-wrap:wrap;}
+.foot-links a{font-size:.78rem;color:var(--smoke);transition:color .15s;}
+.foot-links a:hover{color:var(--chalk);}
+.foot-copy{font-size:.72rem;color:#3a3f52;}
+
+/* ── STICKY MOBILE ── */
+.sticky{display:none;position:fixed;bottom:0;left:0;right:0;z-index:400;background:rgba(9,11,16,.96);border-top:1px solid rgba(245,196,48,.15);backdrop-filter:blur(20px);padding:12px 20px;}
+@media(max-width:640px){.sticky{display:block;}}
+.sticky a{display:flex;align-items:center;justify-content:center;gap:10px;background:var(--gold);color:var(--ink);font-family:'Syne',sans-serif;font-weight:800;font-size:.95rem;padding:15px;border-radius:14px;box-shadow:0 4px 16px rgba(245,196,48,.4);}
+
+/* ── REVEAL ── */
+.rev{opacity:0;transform:translateY(26px);transition:opacity .65s ease,transform .65s ease;}
+.rev.in{opacity:1;transform:translateY(0);}
+.d1{transition-delay:.1s;}.d2{transition-delay:.2s;}.d3{transition-delay:.3s;}.d4{transition-delay:.4s;}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav" id="nav">
+  <div class="nav-logo"><span class="g">•</span>Near<span class="g">Shop</span>&nbsp;Drive</div>
+  <a href="app.html" class="nav-cta">Trouver un commerce →</a>
+</nav>
+
+<!-- ════════════ HERO ════════════ -->
+<section class="hero">
+  <div class="road-bg"></div>
+  <div class="road-dashes"></div>
+  <div class="hero-glow"></div>
+
+  <div class="hero-inner">
+
+    <!-- TEXT -->
+    <div>
+      <div class="hero-badge"><span class="pulse"></span> Nouveau concept · Drive local</div>
+
+      <h1 class="hero-title">
+        Restez dans<br>
+        votre <em>voiture</em>.<span class="car"> 🚗</span><br>
+        On vous livre.
+      </h1>
+
+      <p class="hero-desc">
+        NearShop Drive répertorie les commerces locaux qui
+        <strong>livrent directement à votre véhicule</strong>.<br>
+        Localisez, sélectionnez, commandez via WhatsApp —
+        et restez <strong>confortablement installé</strong>.
+      </p>
+
+      <div class="hero-btns">
+        <a href="app.html" class="btn-gold">🗺️ Trouver un commerce Drive</a>
+        <a href="#comment" class="btn-outline">Comment ça marche ?</a>
+      </div>
+
+      <div class="hero-trust">
+        <span class="trust-item">Sans sortir de voiture</span>
+        <span class="trust-sep">·</span>
+        <span class="trust-item">Commande via WhatsApp</span>
+        <span class="trust-sep">·</span>
+        <span class="trust-item">100% gratuit</span>
+      </div>
+    </div>
+
+    <!-- VISUAL -->
+    <div class="hero-visual">
+      <!-- WhatsApp notification -->
+      <div class="notif-wa">
+        <div class="notif-icon">💬</div>
+        <div class="notif-text">
+          <div class="nt-title">Épicerie Al Warda</div>
+          <div class="nt-msg">Votre commande arrive dans 3 min 🛵</div>
+        </div>
+        <div class="notif-dot"></div>
+      </div>
+
+      <!-- Distance chip -->
+      <div class="chip-dist">📍 À 280m de vous</div>
+
+      <!-- Status chip -->
+      <div class="chip-status">✅ Drive disponible</div>
+
+      <div class="car-scene">
+        <!-- Car SVG -->
+        <svg class="car-svg" viewBox="0 0 400 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <!-- Car body shadow -->
+          <ellipse cx="200" cy="188" rx="160" ry="8" fill="rgba(0,0,0,.35)"/>
+          <!-- Main body -->
+          <rect x="40" y="110" width="320" height="68" rx="16" fill="#1e2235"/>
+          <!-- Cabin -->
+          <path d="M100 110 C115 72 145 58 200 56 C255 58 285 72 300 110 Z" fill="#252a3d"/>
+          <!-- Windshield -->
+          <path d="M130 108 C142 80 162 68 200 66 C238 68 258 80 270 108 Z" fill="rgba(56,189,248,.15)" stroke="rgba(56,189,248,.3)" stroke-width="1.5"/>
+          <!-- Side windows -->
+          <rect x="108" y="78" width="55" height="32" rx="6" fill="rgba(56,189,248,.12)" stroke="rgba(56,189,248,.25)" stroke-width="1.5"/>
+          <rect x="237" y="78" width="55" height="32" rx="6" fill="rgba(56,189,248,.12)" stroke="rgba(56,189,248,.25)" stroke-width="1.5"/>
+          <!-- Body accent line -->
+          <line x1="50" y1="138" x2="350" y2="138" stroke="rgba(245,196,48,.2)" stroke-width="1.5"/>
+          <!-- Front lights -->
+          <rect x="44" y="118" width="28" height="14" rx="7" fill="#f5c430" opacity=".9"/>
+          <rect x="44" y="118" width="28" height="14" rx="7" fill="url(#gl)" opacity=".6"/>
+          <!-- Rear lights -->
+          <rect x="328" y="118" width="28" height="14" rx="7" fill="#ff4444" opacity=".8"/>
+          <!-- Door lines -->
+          <line x1="193" y1="110" x2="193" y2="178" stroke="rgba(255,255,255,.08)" stroke-width="1.5"/>
+          <!-- Door handles -->
+          <rect x="155" y="140" width="20" height="5" rx="2.5" fill="rgba(245,196,48,.4)"/>
+          <rect x="220" y="140" width="20" height="5" rx="2.5" fill="rgba(245,196,48,.4)"/>
+          <!-- Wheels -->
+          <circle cx="108" cy="178" r="22" fill="#141620" stroke="#2a2f45" stroke-width="3"/>
+          <circle cx="108" cy="178" r="13" fill="#1e2235" stroke="rgba(245,196,48,.3)" stroke-width="2"/>
+          <circle cx="108" cy="178" r="4" fill="rgba(245,196,48,.5)"/>
+          <circle cx="292" cy="178" r="22" fill="#141620" stroke="#2a2f45" stroke-width="3"/>
+          <circle cx="292" cy="178" r="13" fill="#1e2235" stroke="rgba(245,196,48,.3)" stroke-width="2"/>
+          <circle cx="292" cy="178" r="4" fill="rgba(245,196,48,.5)"/>
+          <!-- NearShop Drive badge on door -->
+          <rect x="138" y="152" width="56" height="16" rx="8" fill="rgba(245,196,48,.12)" stroke="rgba(245,196,48,.25)" stroke-width="1"/>
+          <text x="166" y="163" fill="#f5c430" font-size="7" font-family="'Syne', sans-serif" font-weight="700" text-anchor="middle">DRIVE</text>
+          <!-- Headlight glow -->
+          <defs>
+            <radialGradient id="gl" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stop-color="#f5c430" stop-opacity=".8"/>
+              <stop offset="100%" stop-color="#f5c430" stop-opacity="0"/>
+            </radialGradient>
+          </defs>
+          <ellipse cx="30" cy="125" rx="40" ry="12" fill="url(#gl)" opacity=".3" transform="rotate(-5 30 125)"/>
+        </svg>
+        <div class="road-strip"></div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ════════════ PROMISE ════════════ -->
+<div class="promise rev" style="max-width:1200px;margin:0 auto 0;padding:0 clamp(20px,5vw,72px) 80px;">
+  <div class="promise rev">
+    <div>
+      <p class="promise-quote">
+        "Plus besoin de chercher une place de parking.<br>
+        Le commerce vient <em>jusqu'à votre voiture</em>."
+      </p>
+      <p class="promise-sub">
+        NearShop Drive est né d'une idée simple : <strong>pourquoi sortir</strong> quand le commerce peut venir à vous ?<br>
+        Tous les commerces répertoriés ont accepté de proposer la <strong>remise au véhicule</strong>.
+      </p>
+    </div>
+    <div class="promise-checklist">
+      <div class="pcheck">
+        <div class="pcheck-icon y">📍</div>
+        <div><div class="pcheck-title">Localisez un commerce Drive</div><div class="pcheck-desc">La carte affiche uniquement les commerces qui livrent à votre véhicule, triés par distance.</div></div>
+      </div>
+      <div class="pcheck">
+        <div class="pcheck-icon g">💬</div>
+        <div><div class="pcheck-title">Commandez via WhatsApp</div><div class="pcheck-desc">Un tap pour ouvrir WhatsApp avec le commerce. Indiquez votre position et votre commande.</div></div>
+      </div>
+      <div class="pcheck">
+        <div class="pcheck-icon e">🚗</div>
+        <div><div class="pcheck-title">Restez dans votre voiture</div><div class="pcheck-desc">Le commerçant arrive à votre véhicule. Pratique, rapide, sans stress de stationnement.</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════ ÉTAPES ════════════ -->
+<section class="steps-section rev" id="comment">
+  <div class="sec-eyebrow">Comment ça marche</div>
+  <h2 class="sec-h">3 étapes, c'est tout.</h2>
+  <p class="sec-sub">De la localisation à la livraison à votre voiture, tout se passe sur votre téléphone.</p>
+
+  <div class="steps-grid rev d1">
+    <div class="step-card">
+      <div class="step-num-tag">ÉTAPE 01</div>
+      <span class="step-emoji">🗺️</span>
+      <div class="step-title">Ouvrez la carte Drive</div>
+      <p class="step-desc">La carte se centre sur <strong>votre position</strong>. Vous voyez immédiatement les commerces Drive autour de vous, avec leur distance et leur catégorie.</p>
+    </div>
+    <div class="step-card">
+      <div class="step-num-tag">ÉTAPE 02</div>
+      <span class="step-emoji">💬</span>
+      <div class="step-title">Commandez via WhatsApp</div>
+      <p class="step-desc">Consultez la fiche du commerce — photos, horaires, avis. Un tap sur <strong>"Commander via WhatsApp"</strong> ouvre la conversation directement avec le commerçant.</p>
+    </div>
+    <div class="step-card">
+      <div class="step-num-tag">ÉTAPE 03</div>
+      <span class="step-emoji">🚗</span>
+      <div class="step-title">Restez confortablement installé</div>
+      <p class="step-desc">Le commerçant confirme et vient <strong>jusqu'à votre véhicule</strong>. Plus besoin de chercher une place, de vous presser ou de transporter des sacs.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════ CATEGORIES ════════════ -->
+<section class="cats-section">
+  <div class="inner">
+    <div class="rev">
+      <div class="sec-eyebrow">Catégories</div>
+      <h2 class="sec-h">Tout ce dont vous avez besoin,<br>livré à votre voiture.</h2>
+      <p class="sec-sub" style="margin-bottom:36px;">Des dizaines de types de commerces référencés sur NearShop Drive.</p>
+    </div>
+    <div class="cats-grid rev d1">
+      <div class="cat-card"><span class="cat-emoji">🛒</span><div class="cat-name">Épiceries</div></div>
+      <div class="cat-card"><span class="cat-emoji">🥖</span><div class="cat-name">Boulangeries</div></div>
+      <div class="cat-card"><span class="cat-emoji">🥩</span><div class="cat-name">Boucheries</div></div>
+      <div class="cat-card"><span class="cat-emoji">🍕</span><div class="cat-name">Restaurants</div></div>
+      <div class="cat-card"><span class="cat-emoji">☕</span><div class="cat-name">Cafés</div></div>
+      <div class="cat-card"><span class="cat-emoji">🧁</span><div class="cat-name">Pâtisseries</div></div>
+      <div class="cat-card"><span class="cat-emoji">🌿</span><div class="cat-name">Herboristeries</div></div>
+      <div class="cat-card"><span class="cat-emoji">💊</span><div class="cat-name">Pharmacies</div></div>
+      <div class="cat-card"><span class="cat-emoji">🌸</span><div class="cat-name">Fleuristes</div></div>
+      <div class="cat-card"><span class="cat-emoji">📱</span><div class="cat-name">High-Tech</div></div>
+      <div class="cat-card"><span class="cat-emoji">🧴</span><div class="cat-name">Cosmétiques</div></div>
+      <div class="cat-card"><span class="cat-emoji">🫖</span><div class="cat-name">Épices & Thés</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════ AVANTAGES ════════════ -->
+<section class="drive-section rev">
+  <div class="sec-eyebrow">Pourquoi NearShop Drive</div>
+  <h2 class="sec-h">Zéro friction,<br>zéro stress.</h2>
+  <p class="sec-sub" style="margin-bottom:36px;">Le Drive local, c'est plus simple, plus rapide et plus humain que n'importe quelle app de livraison.</p>
+
+  <div class="drive-cards">
+    <div class="drive-card rev">
+      <div class="dc-num">01</div>
+      <span class="dc-icon">⚡</span>
+      <div class="dc-title">Rapide comme un coup de klaxon</div>
+      <p class="dc-desc">Ouvrez la carte, choisissez un commerce, envoyez un WhatsApp. De la recherche à la livraison en moins de 5 minutes.</p>
+      <span class="dc-tag">Sans attente</span>
+    </div>
+    <div class="drive-card rev d1">
+      <div class="dc-num">02</div>
+      <span class="dc-icon">💸</span>
+      <div class="dc-title">Prix du marché local, sans commission</div>
+      <p class="dc-desc">Vous commandez directement auprès du commerçant. Pas d'intermédiaire, pas de frais de livraison exorbitants.</p>
+      <span class="dc-tag">0% de commission</span>
+    </div>
+    <div class="drive-card rev d2">
+      <div class="dc-num">03</div>
+      <span class="dc-icon">🤝</span>
+      <div class="dc-title">Soutenir le commerce local</div>
+      <p class="dc-desc">Chaque commande va directement dans la poche du commerçant de votre quartier. Pas dans celle d'une multinationale.</p>
+      <span class="dc-tag">Commerce de proximité</span>
+    </div>
+    <div class="drive-card rev d3">
+      <div class="dc-num">04</div>
+      <span class="dc-icon">📵</span>
+      <div class="dc-title">Zéro app à installer</div>
+      <p class="dc-desc">NearShop Drive fonctionne dans votre navigateur. Ouvrez le lien, c'est prêt. Ajoutez-le sur votre écran d'accueil si vous voulez.</p>
+      <span class="dc-tag">PWA</span>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════ CTA FINAL ════════════ -->
+<section class="cta-final">
+  <h2 class="cta-final-title rev">Prêt à rester<br><em>dans votre voiture</em> ?</h2>
+  <p class="cta-final-sub rev d1">Ouvrez la carte, trouvez un commerce Drive près de vous et passez votre commande en un tap.</p>
+  <div class="cta-btns rev d2">
+    <a href="app.html" class="btn-gold">🗺️ Ouvrir la carte Drive</a>
+    <a href="app.html#register" class="btn-outline">🏪 Inscrire mon commerce</a>
+  </div>
+  <div class="cta-trust rev d3">
+    <span>Sans sortir de voiture</span>
+    <span>Via WhatsApp</span>
+    <span>Commerces vérifiés</span>
+    <span>100% gratuit</span>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="foot-inner">
+    <div>
+      <div class="foot-logo"><span class="g">•</span>Near<span class="g">Shop</span>&nbsp;Drive</div>
+      <div class="foot-copy" style="margin-top:5px;">© 2026 · Agadir, Maroc</div>
+    </div>
+    <div class="foot-links">
+      <a href="app.html">La carte</a>
+      <a href="legal.html">Mentions légales</a>
+      <a href="legal.html#confidentialite">Confidentialité</a>
+      <a href="mailto:nearshopdrive@gmail.com">Contact</a>
+    </div>
+  </div>
+</footer>
+
+<!-- STICKY MOBILE -->
+<div class="sticky">
+  <a href="app.html">🚗 Trouver un commerce Drive près de moi →</a>
+</div>
+
+<script>
+const nav = document.getElementById('nav');
+window.addEventListener('scroll', () => {
+  nav.classList.toggle('solid', window.scrollY > 30);
+}, { passive: true });
+
+const obs = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('in'); });
+}, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+document.querySelectorAll('.rev').forEach(el => obs.observe(el));
+</script>
+</body>
+</html>
