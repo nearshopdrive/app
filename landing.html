@@ -732,10 +732,4 @@ const items = [
 const track = document.getElementById('stripTrack');
 [...items, ...items].forEach(t => {
   const d = document.createElement('div');
-  d.className = 'strip-item';
-  d.innerHTML = `<span class="si">${t.split(' ')[0]}</span>${t.split(' ').slice(1).join(' ')}`;
-  track.appendChild(d);
-});
-</script>
-</body>
-</html>
+  d.className = 'strip-ite
