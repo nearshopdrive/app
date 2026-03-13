@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- SEO / OG dynamiques — remplis par JS -->
+  <title>NearShop Drive</title>
+  <meta name="description" id="metaDesc" content="Trouvez ce commerce sur NearShop Drive">
+  <meta property="og:title"       id="ogTitle"   content="NearShop Drive">
+  <meta property="og:description" id="ogDesc"    content="Découvrez ce commerce sur NearShop Drive">
+  <meta property="og:image"       id="ogImage"   content="">
+  <meta property="og:type"        content="business.business">
+  <meta name="twitter:card"       content="summary_large_image">
+
+  <link rel="icon" href="nearshop_logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+  <style>
+    :root{
+      --accent:#f5c518;--accent2:#ff6b35;--green:#3dffa0;
+      --bg:#0d0d0f;--surface:#16161a;--surface2:#1e1e24;
+      --text:#f0f0f5;--muted:#888;--border:#2a2a35;--shadow:0 8px 32px rgba(0,0,0,.4);
+    }
+    [data-theme="light"]{
+      --bg:#f5f5f8;--surface:#fff;--surface2:#f0f0f5;
+      --text:#111;--muted:#666;--border:#e0e0e8;--shadow:0 4px 20px rgba(0,0,0,.08);
+    }
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+
+    /* ── HEADER ── */
+    .header{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;
+      background:var(--surface);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;}
+    .logo{font-family:'Syne',sans-serif;font-weight:800;font-size:1.1rem;display:flex;align-items:center;gap:6px;text-decoration:none;color:var(--text);}
+    .logo span{color:var(--accent);}
+    .header-btns{display:flex;gap:8px;}
+    .header-btn{background:var(--surface2);border:1px solid var(--border);color:var(--text);border-radius:10px;padding:7px 14px;font-size:.8rem;cursor:pointer;text-decoration:none;font-family:'DM Sans',sans-serif;transition:border-color .2s;}
+    .header-btn:hover{border-color:var(--accent);color:var(--accent);}
+    .header-btn.primary{background:var(--accent);color:#000;border-color:var(--accent);font-weight:700;}
+
+    /* ── HERO PHOTO ── */
+    .store-hero{width:100%;height:280px;position:relative;background:var(--surface2);overflow:hidden;display:flex;align-items:center;justify-content:center;margin-top:64px;}
+    .store-hero img{width:100%;height:100%;object-fit:cover;}
+    .hero-overlay{position:absolute;inset:0;background:linear-gradient(to top,var(--bg) 0%,rgba(0,0,0,.3) 60%,transparent 100%);}
+    .hero-placeholder{font-size:5rem;}
+    .hero-badge{position:absolute;top:16px;right:16px;padding:6px 14px;border-radius:20px;font-size:.78rem;font-weight:700;font-family:'Syne',sans-serif;}
+    .badge-open{background:rgba(61,255,160,.2);color:var(--green);border:1px solid var(--green);}
+    .badge-closed{background:rgba(255,107,53,.15);color:var(--accent2);border:1px solid var(--accent2);}
+
+    /* Flèches galerie hero */
+    .hero-arrow{position:absolute;top:50%;transform:translateY(-50%);background:rgba(0,0,0,.5);border:none;color:#fff;width:38px;height:38px;border-radius:50%;cursor:pointer;font-size:1.2rem;z-index:5;backdrop-filter:blur(4px);}
+    .hero-arrow-left{left:12px;}
+    .hero-arrow-right{right:12px;}
+    .hero-counter{position:absolute;bottom:52px;right:14px;background:rgba(0,0,0,.6);color:#fff;font-size:.72rem;font-weight:700;padding:3px 8px;border-radius:20px;z-index:5;}
+
+    /* ── CONTENU ── */
+    .container{max-width:720px;margin:0 auto;padding:0 16px 60px;}
+    .store-main{margin-top:-40px;position:relative;z-index:10;background:var(--surface);border-radius:20px 20px 0 0;padding:24px;}
+
+    .store-name{font-family:'Syne',sans-serif;font-weight:800;font-size:1.6rem;margin-bottom:4px;}
+    .store-cat{color:var(--muted);font-size:.9rem;margin-bottom:12px;}
+    .store-rating{display:flex;align-items:center;gap:8px;margin-bottom:18px;}
+    .stars{color:var(--accent);letter-spacing:1px;}
+    .rating-count{color:var(--muted);font-size:.8rem;}
+
+    /* Actions */
+    .actions{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:24px;}
+    .action-btn{flex:1;min-width:120px;display:flex;align-items:center;justify-content:center;gap:7px;padding:11px 16px;border-radius:12px;border:1px solid var(--border);background:var(--surface2);color:var(--text);font-family:'DM Sans',sans-serif;font-size:.85rem;font-weight:600;cursor:pointer;text-decoration:none;transition:all .2s;}
+    .action-btn:hover{border-color:var(--accent);color:var(--accent);}
+    .action-btn.whatsapp{border-color:#25D366;color:#25D366;background:rgba(37,211,102,.08);}
+    .action-btn.whatsapp:hover{background:rgba(37,211,102,.18);}
+    .action-btn.primary{background:var(--accent);color:#000;border-color:var(--accent);font-weight:700;}
+    .action-btn.primary:hover{filter:brightness(1.1);}
+    #favStoreBtn.active{color:#e05c5c;border-color:#e05c5c;background:rgba(224,92,92,.1);}
+
+    /* Infos */
+    .info-card{background:var(--surface2);border-radius:14px;padding:16px;margin-bottom:20px;}
+    .info-row{display:flex;align-items:flex-start;gap:12px;padding:10px 0;border-bottom:1px solid var(--border);}
+    .info-row:last-child{border-bottom:none;padding-bottom:0;}
+    .info-icon{font-size:1.1rem;flex-shrink:0;width:24px;text-align:center;}
+    .info-label{font-size:.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin-bottom:2px;}
+    .info-value{font-size:.88rem;font-weight:500;}
+
+    /* Miniatures galerie */
+    .gallery-strip{display:flex;gap:8px;overflow-x:auto;padding:4px 0 12px;scrollbar-width:none;margin-bottom:20px;}
+    .gallery-strip::-webkit-scrollbar{display:none;}
+    .gallery-thumb{width:80px;height:80px;border-radius:10px;object-fit:cover;cursor:pointer;border:2px solid transparent;transition:all .2s;flex-shrink:0;}
+    .gallery-thumb:hover,.gallery-thumb.active{border-color:var(--accent);transform:scale(1.05);}
+
+    /* Minimap */
+    #storeMap{height:200px;border-radius:14px;overflow:hidden;margin-bottom:20px;}
+
+    /* Avis */
+    .section-title{font-family:'Syne',sans-serif;font-weight:800;font-size:1rem;margin-bottom:14px;display:flex;align-items:center;gap:6px;}
+    .review-card{background:var(--surface2);border-radius:12px;padding:14px;margin-bottom:10px;}
+    .review-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;}
+    .review-author{font-weight:700;font-size:.85rem;}
+    .review-stars{color:var(--accent);font-size:.85rem;}
+    .review-text{font-size:.83rem;color:var(--muted);line-height:1.5;}
+    .review-date{font-size:.72rem;color:var(--muted);margin-top:4px;}
+    .no-reviews{text-align:center;color:var(--muted);padding:24px;font-size:.85rem;}
+
+    /* Lightbox */
+    #storeLightbox{display:none;position:fixed;inset:0;background:rgba(0,0,0,.96);z-index:9999;flex-direction:column;align-items:center;justify-content:center;}
+    #storeLightbox.open{display:flex;}
+    #storeLightbox img{max-width:95vw;max-height:85vh;object-fit:contain;border-radius:8px;}
+    .lb-close{position:absolute;top:16px;right:16px;background:rgba(255,255,255,.15);border:none;color:#fff;width:38px;height:38px;border-radius:50%;cursor:pointer;font-size:1.2rem;}
+    .lb-arrow{position:absolute;top:50%;transform:translateY(-50%);background:rgba(255,255,255,.15);border:none;color:#fff;width:44px;height:44px;border-radius:50%;cursor:pointer;font-size:1.4rem;transition:background .2s;}
+    .lb-arrow:hover{background:rgba(255,255,255,.3);}
+    .lb-arrow-l{left:14px;}
+    .lb-arrow-r{right:14px;}
+
+    /* Toast */
+    .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--green);color:#000;font-weight:700;padding:11px 22px;border-radius:30px;font-size:.85rem;z-index:99999;opacity:0;transition:all .35s;pointer-events:none;white-space:nowrap;}
+    .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+    /* Skeleton */
+    .skeleton{background:linear-gradient(90deg,var(--surface2) 25%,var(--border) 50%,var(--surface2) 75%);background-size:200% 100%;animation:shimmer 1.4s infinite;}
+    @keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+    .skel-line{height:14px;border-radius:6px;margin-bottom:10px;}
+
+    /* Responsive */
+    @media(max-width:600px){
+      .store-hero{height:220px;}
+      .store-name{font-size:1.3rem;}
+      .actions{gap:8px;}
+      .action-btn{font-size:.78rem;padding:9px 12px;}
+    }
+  
+/* ═══ SHARED NAV — NearShop Drive ═══ */
+.ns-nav{position:fixed;top:0;left:0;right:0;z-index:500;height:64px;display:flex;align-items:center;justify-content:space-between;padding:0 clamp(16px,4vw,52px);transition:background .35s,border-color .35s;}
+.ns-nav.solid{background:rgba(8,11,18,.92);border-bottom:1px solid var(--border,#1e2840);backdrop-filter:blur(20px);}
+.ns-logo{font-family:'Syne',sans-serif;font-weight:800;font-size:1.1rem;letter-spacing:-.3px;display:flex;align-items:center;gap:2px;flex-shrink:0;text-decoration:none;color:inherit;}
+.ns-logo .nsg{color:var(--accent,#f0c040);}
+.ns-links{display:flex;align-items:center;gap:2px;}
+.ns-link{padding:7px 13px;border-radius:100px;font-size:.82rem;font-weight:500;color:var(--muted2,#8090aa);transition:color .18s,background .18s;white-space:nowrap;text-decoration:none;}
+.ns-link:hover{color:var(--text,#eef0f5);background:rgba(255,255,255,.05);}
+.ns-link.ns-active{color:var(--text,#eef0f5);}
+.ns-nav-right{display:flex;align-items:center;gap:10px;}
+.ns-cta-btn{background:var(--accent,#f0c040);color:#000;font-family:'Syne',sans-serif;font-weight:700;font-size:.82rem;padding:9px 18px;border-radius:100px;transition:transform .15s,box-shadow .15s;white-space:nowrap;text-decoration:none;}
+.ns-cta-btn:hover{transform:translateY(-1px);box-shadow:0 6px 22px rgba(240,192,64,.4);}
+.ns-burger{display:none;flex-direction:column;gap:5px;background:none;border:none;cursor:pointer;padding:6px;}
+.ns-burger span{display:block;width:22px;height:2px;background:var(--text,#eef0f5);border-radius:2px;transition:all .25s;}
+.ns-burger.open span:nth-child(1){transform:translateY(7px) rotate(45deg);}
+.ns-burger.open span:nth-child(2){opacity:0;}
+.ns-burger.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg);}
+.ns-drawer{display:none;position:fixed;top:64px;left:0;right:0;z-index:490;background:rgba(8,11,18,.97);backdrop-filter:blur(20px);border-bottom:1px solid var(--border,#1e2840);flex-direction:column;padding:16px;gap:4px;transform:translateY(-8px);opacity:0;transition:opacity .25s,transform .25s;pointer-events:none;}
+.ns-drawer.open{display:flex;transform:translateY(0);opacity:1;pointer-events:all;}
+.ns-drawer .ns-link{font-size:.95rem;padding:12px 16px;border-radius:12px;}
+.ns-drawer .ns-cta-btn{text-align:center;padding:13px;border-radius:12px;margin-top:8px;display:block;}
+@media(max-width:860px){.ns-links{display:none;}.ns-burger{display:flex;}}
+@media(max-width:500px){.ns-nav .ns-cta-btn{display:none;}}
+</style>
+</head>
+<body>
+
+
+<!-- ══ SHARED NAV ══ -->
+<nav class="ns-nav" id="nsNav">
+  <a href="index.html" class="ns-logo"><span class="nsg">•</span>Near<span class="nsg">Shop</span>&nbsp;Drive</a>
+  <div class="ns-links">
+    <a href="index.html" class="ns-link ns-active">Accueil</a>
+    <a href="index.html#comment" class="ns-link">Comment ça marche</a>
+    <a href="index.html#concept" class="ns-link">Le concept</a>
+    <a href="index.html#fonctionnalites" class="ns-link">Fonctionnalités</a>
+    <a href="inscription.html" class="ns-link">Inscrire mon commerce</a>
+    <a href="inscription.html" class="ns-link">Inscrire mon commerce</a>
+  <a href="legal.html" class="ns-link">Légal</a>
+  </div>
+  <div class="ns-nav-right">
+    <a href="app.html" class="ns-cta-btn">🗺️ Ouvrir la carte</a>
+    <button class="ns-burger" id="nsBurger" aria-label="Menu"><span></span><span></span><span></span></button>
+  </div>
+</nav>
+<div class="ns-drawer" id="nsDrawer">
+    <a href="index.html" class="ns-link ns-active">Accueil</a>
+    <a href="index.html#comment" class="ns-link">Comment ça marche</a>
+    <a href="index.html#concept" class="ns-link">Le concept</a>
+    <a href="index.html#fonctionnalites" class="ns-link">Fonctionnalités</a>
+    <a href="legal.html" class="ns-link">Légal</a>
+  <a href="app.html" class="ns-cta-btn">🗺️ Ouvrir la carte</a>
+</div>
+
+<!-- Hero photo -->
+<div class="store-hero" id="storeHero">
+  <div class="hero-placeholder" id="heroPlaceholder">🏪</div>
+</div>
+
+<!-- Contenu principal -->
+<div class="container">
+  <div class="store-main">
+
+    <!-- Skeleton chargement -->
+    <div id="skelLoader">
+      <div class="skel-line skeleton" style="width:60%;height:26px;margin-bottom:8px"></div>
+      <div class="skel-line skeleton" style="width:35%"></div>
+      <div class="skel-line skeleton" style="width:80%;margin-top:14px"></div>
+      <div class="skel-line skeleton" style="width:70%"></div>
+    </div>
+
+    <!-- Données réelles -->
+    <div id="storeContent" style="display:none">
+      <div class="store-name" id="storeName"></div>
+      <div class="store-cat" id="storeCatLine"></div>
+      <div class="store-rating" id="storeRatingBlock"></div>
+
+      <!-- Boutons d'action -->
+      <div class="actions">
+        <a class="action-btn primary" id="btnDirections" href="#" target="_blank">🗺️ Itinéraire</a>
+        <a class="action-btn" id="btnWhatsapp" href="#" target="_blank" style="display:none">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.138.563 4.14 1.547 5.874L0 24l6.273-1.519A11.934 11.934 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.818 9.818 0 01-5.032-1.388l-.36-.214-3.733.904.946-3.629-.235-.374A9.818 9.818 0 012.182 12C2.182 6.573 6.573 2.182 12 2.182S21.818 6.573 21.818 12 17.427 21.818 12 21.818z"/></svg>
+          WhatsApp
+        </a>
+        <button class="action-btn" id="btnShare" onclick="shareStore()">🔗 Partager</button>
+        <button class="action-btn" id="favStoreBtn" onclick="toggleFavPage()">🤍 Favoris</button>
+      </div>
+
+      <!-- Galerie miniatures -->
+      <div class="gallery-strip" id="galleryStrip" style="display:none"></div>
+
+      <!-- Infos -->
+      <div class="info-card" id="infoCard"></div>
+
+      <!-- Mini carte -->
+      <div id="storeMap"></div>
+
+      <!-- Avis -->
+      <div class="section-title">⭐ Avis clients <span id="reviewCountBadge" style="background:var(--surface2);color:var(--muted);font-size:.72rem;padding:2px 8px;border-radius:20px;font-family:'DM Sans',sans-serif;font-weight:400"></span></div>
+      <div id="reviewsList"></div>
+
+      <!-- Lien retour -->
+      <div style="text-align:center;margin-top:28px;">
+        <a href="app.html" style="color:var(--muted);font-size:.82rem;text-decoration:none;display:inline-flex;align-items:center;gap:6px">
+          ← Voir tous les magasins sur NearShop Drive
+        </a>
+      </div>
+    </div>
+
+    <!-- Erreur -->
+    <div id="storeError" style="display:none;text-align:center;padding:40px 20px">
+      <div style="font-size:3rem;margin-bottom:12px">😕</div>
+      <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.1rem;margin-bottom:8px">Commerce introuvable</div>
+      <div style="color:var(--muted);font-size:.85rem;margin-bottom:20px">Ce lien est peut-être invalide ou le commerce a été supprimé.</div>
+      <a href="app.html" class="action-btn primary" style="display:inline-flex;text-decoration:none">🗺️ Retour à la carte</a>
+    </div>
+
+  </div>
+</div>
+
+<!-- Lightbox -->
+<div id="storeLightbox">
+  <button class="lb-close" onclick="closeLightbox()">✕</button>
+  <button class="lb-arrow lb-arrow-l" onclick="lbNav(-1)">‹</button>
+  <img id="lbImg" src="" alt="">
+  <button class="lb-arrow lb-arrow-r" onclick="lbNav(1)">›</button>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<!-- Firebase compat -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+
+<script>
+// ── Firebase config ──
+const app = firebase.initializeApp({
+  apiKey:            "AIzaSyBTZo3KUAZcu9qXCaJnsSzJLMP0uRDbwuE",
+  authDomain:        "nearshop-app-f7386.firebaseapp.com",
+  projectId:         "nearshop-app-f7386",
+  storageBucket:     "nearshop-app-f7386.firebasestorage.app",
+  appId:             "1:1097916872096:web:23f6d421e3fd2f9863a0c5"
+});
+const db   = firebase.firestore();
+const auth = firebase.auth();
+
+// ── État ──
+let storeData   = null;
+let storePhotos = [];
+let heroIdx     = 0;
+let lbIdx       = 0;
+let currentUser = null;
+let favsCache   = [];
+
+auth.onAuthStateChanged(u => {
+  currentUser = u;
+  if (u) loadFavs(u.uid);
+});
+
+// ── Lire l'ID depuis l'URL ──
+const params  = new URLSearchParams(location.search);
+const storeId = params.get('id');
+
+window.addEventListener('load', () => {
+  if (!storeId) { showError(); return; }
+  loadStore(storeId);
+});
+
+// ── Charger le magasin ──
+async function loadStore(id) {
+  try {
+    const snap = await db.collection('stores').doc(id).get();
+    if (!snap.exists) { showError(); return; }
+    storeData   = { id: snap.id, ...snap.data() };
+    storePhotos = storeData.photos && storeData.photos.length ? storeData.photos : [];
+    renderStore();
+    loadReviews(id);
+  } catch(e) {
+    console.error(e);
+    showError();
+  }
+}
+
+function renderStore() {
+  const s = storeData;
+
+  // SEO
+  document.title = `${s.name} — NearShop Drive`;
+  document.getElementById('metaDesc').content = `${s.name} · ${s.cat} · ${s.address}`;
+  document.getElementById('ogTitle').content  = s.name;
+  document.getElementById('ogDesc').content   = `${s.cat} · ${s.address}`;
+  if (storePhotos[0]) document.getElementById('ogImage').content = storePhotos[0];
+
+  // Hero
+  const hero = document.getElementById('storeHero');
+  renderHero(0);
+  if (storePhotos.length > 1) {
+    hero.insertAdjacentHTML('beforeend',
+      `<button class="hero-arrow hero-arrow-left"  onclick="heroNav(-1)">&#8249;</button>
+       <button class="hero-arrow hero-arrow-right" onclick="heroNav(1)">&#8250;</button>
+       <div class="hero-counter" id="heroCounter">1 / ${storePhotos.length}</div>`);
+  }
+  // Badge statut
+  const badgeCls = s.status === 'open' ? 'badge-open' : 'badge-closed';
+  const badgeTxt = s.status === 'open' ? '🟢 Ouvert' : '🔴 Fermé';
+  hero.insertAdjacentHTML('beforeend', `<div class="hero-badge ${badgeCls}">${badgeTxt}</div>`);
+
+  // Infos principales
+  document.getElementById('storeName').textContent    = s.name;
+  document.getElementById('storeCatLine').textContent = s.cat || '';
+
+  // Note
+  const ratingBlock = document.getElementById('storeRatingBlock');
+  if (s.avgRating) {
+    const stars = '★'.repeat(Math.round(s.avgRating)) + '☆'.repeat(5 - Math.round(s.avgRating));
+    ratingBlock.innerHTML = `<span class="stars">${stars}</span>
+      <strong>${s.avgRating.toFixed(1)}</strong>
+      <span class="rating-count">(${s.reviewCount || 0} avis)</span>`;
+  } else {
+    ratingBlock.innerHTML = `<span style="color:var(--muted);font-size:.82rem">Aucun avis pour l'instant</span>`;
+  }
+
+  // Boutons
+  document.getElementById('btnDirections').href = `https://www.google.com/maps/dir/?api=1&destination=${s.lat},${s.lng}`;
+  if (s.whatsapp) {
+    const wa = document.getElementById('btnWhatsapp');
+    wa.href  = 'https://wa.me/' + s.whatsapp.replace(/[^\d]/g,'');
+    wa.style.display = 'flex';
+    wa.className = 'action-btn whatsapp';
+  }
+
+  // Info card
+  const rows = [];
+  if (s.address) rows.push({ icon:'📍', label:'Adresse',   value: s.address });
+  if (s.hours)   rows.push({ icon:'🕐', label:'Horaires',  value: s.hours });
+  if (s.phone)   rows.push({ icon:'📞', label:'Téléphone', value: s.phone });
+  if (s.desc)    rows.push({ icon:'📝', label:'Description', value: s.desc });
+  document.getElementById('infoCard').innerHTML = rows.map(r =>
+    `<div class="info-row">
+       <div class="info-icon">${r.icon}</div>
+       <div><div class="info-label">${r.label}</div><div class="info-value">${r.value}</div></div>
+     </div>`
+  ).join('');
+
+  // Galerie miniatures
+  if (storePhotos.length > 1) {
+    const strip = document.getElementById('galleryStrip');
+    strip.innerHTML = storePhotos.map((p,i) =>
+      `<img src="${p}" class="gallery-thumb${i===0?' active':''}" onclick="heroNav(${i}-heroIdx)" alt="photo ${i+1}">`
+    ).join('');
+    strip.style.display = 'flex';
+  }
+
+  // Mini-carte Leaflet
+  setTimeout(() => {
+    const map = L.map('storeMap', { zoomControl:false, scrollWheelZoom:false })
+      .setView([s.lat, s.lng], 16);
+    L.tileLayer('https://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', {
+      maxZoom:20, subdomains:['mt0','mt1','mt2','mt3']
+    }).addTo(map);
+    const icon = L.divIcon({
+      html:`<div style="background:var(--accent);border-radius:50%;width:18px;height:18px;border:3px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.4)"></div>`,
+      className:'', iconSize:[18,18], iconAnchor:[9,9]
+    });
+    L.marker([s.lat, s.lng], { icon }).addTo(map)
+      .bindPopup(`<b>${s.name}</b><br>${s.cat}`).openPopup();
+  }, 200);
+
+  // Favori
+  updateFavBtn();
+
+  // Afficher
+  document.getElementById('skelLoader').style.display  = 'none';
+  document.getElementById('storeContent').style.display = 'block';
+}
+
+// ── Galerie hero ──
+function renderHero(idx) {
+  heroIdx = idx;
+  const hero = document.getElementById('storeHero');
+  const ph   = document.getElementById('heroPlaceholder');
+  if (storePhotos.length) {
+    if (ph) ph.style.display = 'none';
+    // Supprimer ancienne image
+    hero.querySelectorAll('img').forEach(el => el.remove());
+    const img = document.createElement('img');
+    img.src = storePhotos[idx];
+    img.alt = storeData ? storeData.name : '';
+    hero.insertBefore(img, hero.firstChild);
+    const overlay = hero.querySelector('.hero-overlay');
+    if (!overlay) hero.insertAdjacentHTML('beforeend', '<div class="hero-overlay"></div>');
+  }
+  const ctr = document.getElementById('heroCounter');
+  if (ctr) ctr.textContent = `${idx+1} / ${storePhotos.length}`;
+  // Miniatures
+  document.querySelectorAll('.gallery-thumb').forEach((t,i) => {
+    t.classList.toggle('active', i === idx);
+  });
+}
+
+function heroNav(delta) {
+  const len = storePhotos.length;
+  if (!len) return;
+  renderHero((heroIdx + delta + len) % len);
+}
+
+// ── Lightbox ──
+function openLightbox(idx) {
+  lbIdx = idx;
+  document.getElementById('lbImg').src = storePhotos[lbIdx];
+  document.getElementById('storeLightbox').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeLightbox() {
+  document.getElementById('storeLightbox').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function lbNav(delta) {
+  lbIdx = (lbIdx + delta + storePhotos.length) % storePhotos.length;
+  const img = document.getElementById('lbImg');
+  img.style.opacity = '0';
+  setTimeout(() => { img.src = storePhotos[lbIdx]; img.style.opacity = '1'; }, 150);
+}
+
+document.addEventListener('keydown', e => {
+  if (!document.getElementById('storeLightbox').classList.contains('open')) return;
+  if (e.key === 'Escape')     closeLightbox();
+  if (e.key === 'ArrowRight') lbNav(1);
+  if (e.key === 'ArrowLeft')  lbNav(-1);
+});
+
+// ── Avis ──
+async function loadReviews(id) {
+  const el = document.getElementById('reviewsList');
+  try {
+    const snap = await db.collection(`stores/${id}/reviews`).orderBy('createdAt','desc').limit(20).get();
+    const revs = snap.docs.map(d => d.data());
+    document.getElementById('reviewCountBadge').textContent = revs.length ? `${revs.length} avis` : '';
+    if (!revs.length) {
+      el.innerHTML = '<div class="no-reviews">Aucun avis pour l\'instant. Soyez le premier !</div>';
+      return;
+    }
+    el.innerHTML = revs.map(r => {
+      const stars = '★'.repeat(r.rating||0) + '☆'.repeat(5-(r.rating||0));
+      const date  = r.createdAt?.toDate ? r.createdAt.toDate().toLocaleDateString('fr-BE',{day:'2-digit',month:'short',year:'numeric'}) : '';
+      return `<div class="review-card">
+        <div class="review-header">
+          <div class="review-author">${r.author||'Anonyme'}</div>
+          <div class="review-stars">${stars}</div>
+        </div>
+        <div class="review-text">${r.text||''}</div>
+        <div class="review-date">${date}</div>
+      </div>`;
+    }).join('');
+  } catch(e) {
+    el.innerHTML = '<div class="no-reviews">Impossible de charger les avis.</div>';
+  }
+}
+
+// ── Favoris ──
+async function loadFavs(uid) {
+  try {
+    const doc = await db.collection('users').doc(uid).get();
+    favsCache = (doc.exists && Array.isArray(doc.data().favorites)) ? doc.data().favorites : [];
+  } catch(e) {
+    favsCache = JSON.parse(localStorage.getItem('nearshop_favs') || '[]');
+  }
+  updateFavBtn();
+}
+
+function isFav(id) { return favsCache.includes(id); }
+
+async function toggleFavPage() {
+  if (!currentUser) {
+    showToast('👤 Connectez-vous sur la carte pour sauvegarder des favoris');
+    setTimeout(() => { window.location.href = 'app.html'; }, 1800);
+    return;
+  }
+  const id  = storeData.id;
+  const idx = favsCache.indexOf(id);
+  if (idx === -1) { favsCache.push(id); showToast('❤️ Ajouté aux favoris !'); }
+  else            { favsCache.splice(idx,1); showToast('💔 Retiré des favoris'); }
+  localStorage.setItem('nearshop_favs', JSON.stringify(favsCache));
+  try {
+    await db.collection('users').doc(currentUser.uid).update({ favorites: favsCache });
+  } catch(e) {
+    await db.collection('users').doc(currentUser.uid).set({ favorites: favsCache }, { merge: true });
+  }
+  updateFavBtn();
+}
+
+function updateFavBtn() {
+  const btn = document.getElementById('favStoreBtn');
+  if (!btn || !storeData) return;
+  const fav = isFav(storeData.id);
+  btn.innerHTML = fav ? '❤️ Favoris' : '🤍 Favoris';
+  btn.classList.toggle('active', fav);
+}
+
+// ── Partager ──
+function shareStore() {
+  const url = location.href;
+  if (navigator.share) {
+    navigator.share({ title: storeData?.name || 'NearShop Drive', url });
+  } else {
+    navigator.clipboard.writeText(url).then(() => showToast('🔗 Lien copié !'));
+  }
+}
+
+// ── Helpers ──
+function showError() {
+  document.getElementById('skelLoader').style.display  = 'none';
+  document.getElementById('storeError').style.display  = 'block';
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2800);
+}
+
+// Click hero → lightbox si photos
+document.getElementById('storeHero').addEventListener('click', () => {
+  if (storePhotos.length) openLightbox(heroIdx);
+});
+
+// Touch swipe sur hero
+let _tx = 0;
+document.getElementById('storeHero').addEventListener('touchstart', e => { _tx = e.touches[0].clientX; }, { passive:true });
+document.getElementById('storeHero').addEventListener('touchend', e => {
+  const dx = e.changedTouches[0].clientX - _tx;
+  if (Math.abs(dx) > 40) heroNav(dx < 0 ? 1 : -1);
+}, { passive:true });
+</script>
+
+<!-- ── Footer légal ── -->
+<footer style="background:var(--surface,#161921);border-top:1px solid var(--border,#2a2f3e);padding:18px 24px;text-align:center;margin-top:32px;">
+  <div style="display:flex;gap:16px;justify-content:center;flex-wrap:wrap;margin-bottom:8px;">
+    <a href="index.html" style="color:var(--muted,#7a8099);text-decoration:none;font-size:.8rem;transition:color .15s" onmouseover="this.style.color='var(--accent,#f0c040)'" onmouseout="this.style.color='var(--muted,#7a8099)'">🗺️ Carte</a>
+    <a href="app.html" style="color:var(--muted,#7a8099);text-decoration:none;font-size:.8rem;transition:color .15s" onmouseover="this.style.color='var(--accent,#f0c040)'" onmouseout="this.style.color='var(--muted,#7a8099)'">🏪 Commerces</a>
+    <a href="legal.html" style="color:var(--muted,#7a8099);text-decoration:none;font-size:.8rem;transition:color .15s" onmouseover="this.style.color='var(--accent,#f0c040)'" onmouseout="this.style.color='var(--muted,#7a8099)'">⚖️ Mentions légales</a>
+    <a href="legal.html#confidentialite" style="color:var(--muted,#7a8099);text-decoration:none;font-size:.8rem;transition:color .15s" onmouseover="this.style.color='var(--accent,#f0c040)'" onmouseout="this.style.color='var(--muted,#7a8099)'">🔒 Confidentialité</a>
+    <a href="legal.html#cgu" style="color:var(--muted,#7a8099);text-decoration:none;font-size:.8rem;transition:color .15s" onmouseover="this.style.color='var(--accent,#f0c040)'" onmouseout="this.style.color='var(--muted,#7a8099)'">📋 CGU</a>
+  </div>
+  <p style="font-size:.72rem;color:var(--muted,#7a8099)">© 2026 NearShop Drive — Agadir, Maroc</p>
+</footer>
+<script>
+/* Shared nav */
+(function(){
+  var nav=document.getElementById('nsNav');
+  if(nav){
+    window.addEventListener('scroll',function(){nav.classList.toggle('solid',window.scrollY>30);},{passive:true});
+  }
+  var burger=document.getElementById('nsBurger'),drawer=document.getElementById('nsDrawer');
+  if(burger&&drawer){
+    burger.addEventListener('click',function(){burger.classList.toggle('open');drawer.classList.toggle('open');});
+    drawer.querySelectorAll('a').forEach(function(a){a.addEventListener('click',function(){burger.classList.remove('open');drawer.classList.remove('open');});});
+  }
+})();
+</script>
+</body>
+</html>

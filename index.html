@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NearShop Drive — Livraison à votre véhicule</title>
+<meta name="description" content="Les commerces locaux livrent directement à votre voiture. Localisez, commandez via WhatsApp, restez dans votre véhicule.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,700;1,9..40,300&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════
+   TOKENS
+═══════════════════════════════════════ */
+:root {
+  --bg:      #080b12;
+  --bg2:     #10131b;
+  --bg3:     #161d2e;
+  --border:  #1e2840;
+  --border2: #252d42;
+  --gold:    #f0c040;
+  --gold-d:  rgba(240,192,64,.12);
+  --ember:   #ff6b35;
+  --jade:    #3dffa0;
+  --sky:     #38bdf8;
+  --chalk:   #eef0f5;
+  --muted:   #5a6680;
+  --muted2:  #8090aa;
+  --r:       14px;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; overflow-x: hidden; }
+body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--chalk); overflow-x: hidden; -webkit-tap-highlight-color: transparent; }
+a { text-decoration: none; color: inherit; }
+
+/* Noise */
+body::before { content: ''; position: fixed; inset: 0; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E"); opacity: .018; pointer-events: none; z-index: 9999; }
+
+/* ═══════════════════════════════════════
+   SHARED NAV
+═══════════════════════════════════════ */
+.ns-nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 500;
+  height: 64px;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 clamp(16px, 4vw, 56px);
+  transition: background .35s, border-color .35s;
+}
+.ns-nav.solid {
+  background: rgba(8,11,18,.92);
+  border-bottom: 1px solid var(--border);
+  backdrop-filter: blur(20px);
+}
+.ns-logo {
+  font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.1rem; letter-spacing: -.3px;
+  display: flex; align-items: center; gap: 2px; flex-shrink: 0;
+}
+.ns-logo-dot, .ns-logo-shop { color: var(--gold); }
+
+/* Desktop links */
+.ns-links {
+  display: flex; align-items: center; gap: 2px;
+}
+.ns-link {
+  padding: 7px 14px; border-radius: 100px;
+  font-size: .82rem; font-weight: 500; color: var(--muted2);
+  transition: color .18s, background .18s;
+  white-space: nowrap;
+}
+.ns-link:hover { color: var(--chalk); background: rgba(255,255,255,.05); }
+.ns-link.active { color: var(--chalk); }
+
+/* Right side */
+.ns-nav-right { display: flex; align-items: center; gap: 10px; }
+.ns-cta {
+  background: var(--gold); color: #000;
+  font-family: 'Syne', sans-serif; font-weight: 700; font-size: .82rem;
+  padding: 9px 18px; border-radius: 100px;
+  transition: transform .15s, box-shadow .15s;
+  white-space: nowrap;
+}
+.ns-cta:hover { transform: translateY(-1px); box-shadow: 0 6px 22px rgba(240,192,64,.4); }
+
+/* Burger */
+.ns-burger {
+  display: none; flex-direction: column; gap: 5px;
+  background: none; border: none; cursor: pointer; padding: 6px;
+}
+.ns-burger span { display: block; width: 22px; height: 2px; background: var(--chalk); border-radius: 2px; transition: all .25s; }
+.ns-burger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+.ns-burger.open span:nth-child(2) { opacity: 0; }
+.ns-burger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+/* Mobile menu drawer */
+.ns-drawer {
+  display: none;
+  position: fixed; top: 64px; left: 0; right: 0; z-index: 490;
+  background: rgba(8,11,18,.97); backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+  flex-direction: column; padding: 16px;
+  gap: 4px;
+  transform: translateY(-8px); opacity: 0;
+  transition: opacity .25s, transform .25s;
+}
+.ns-drawer.open { display: flex; transform: translateY(0); opacity: 1; }
+.ns-drawer .ns-link { font-size: .95rem; padding: 12px 16px; border-radius: var(--r); }
+.ns-drawer .ns-cta { text-align: center; padding: 13px; border-radius: var(--r); margin-top: 8px; }
+
+@media (max-width: 860px) {
+  .ns-links { display: none; }
+  .ns-burger { display: flex; }
+}
+@media (max-width: 500px) {
+  .ns-cta { display: none; }
+}
+
+/* ═══════════════════════════════════════
+   HERO
+═══════════════════════════════════════ */
+.hero {
+  min-height: 100svh;
+  display: grid; grid-template-columns: 1fr 1fr;
+  align-items: center; gap: 56px;
+  padding: 90px clamp(20px,5vw,72px) 60px;
+  max-width: 1200px; margin: 0 auto;
+  position: relative;
+}
+@media (max-width: 860px) { .hero { grid-template-columns: 1fr; text-align: center; padding-top: 100px; gap: 32px; } .hero-visual { display: none; } }
+
+.hero::before { content: ''; position: absolute; left: -10%; top: 5%; width: 600px; height: 600px; background: radial-gradient(ellipse, rgba(240,192,64,.07), transparent 65%); pointer-events: none; }
+
+/* Road bg lines */
+.hero-road-bg { position: fixed; inset: 0; pointer-events: none; z-index: 0;
+  background: repeating-linear-gradient(90deg, transparent 0, transparent 59px, rgba(240,192,64,.03) 59px, rgba(240,192,64,.03) 60px);
+  mask-image: radial-gradient(ellipse 90% 80% at 50% 100%, black 10%, transparent 70%);
+}
+
+.hero-badge {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: rgba(240,192,64,.1); border: 1px solid rgba(240,192,64,.25); color: var(--gold);
+  border-radius: 100px; padding: 6px 16px;
+  font-size: .72rem; font-weight: 700; letter-spacing: .5px; text-transform: uppercase;
+  margin-bottom: 22px;
+  opacity: 0; animation: up .5s .1s forwards;
+}
+.pulse { width: 8px; height: 8px; border-radius: 50%; background: var(--gold); animation: blinkDot 1.8s ease-in-out infinite; }
+@keyframes blinkDot { 0%,100%{opacity:1;} 50%{opacity:.25;} }
+
+.hero-title {
+  font-family: 'Syne', sans-serif;
+  font-size: clamp(2.6rem, 5.5vw, 4.4rem);
+  font-weight: 800; letter-spacing: -2px; line-height: 1.06;
+  margin-bottom: 22px;
+  opacity: 0; animation: up .5s .22s forwards;
+}
+.hero-title em { font-style: normal; color: var(--gold); }
+
+.hero-desc {
+  font-size: clamp(.95rem, 1.8vw, 1.1rem); font-weight: 300;
+  color: var(--muted2); line-height: 1.7; max-width: 500px;
+  margin-bottom: 36px;
+  opacity: 0; animation: up .5s .34s forwards;
+}
+@media (max-width:860px) { .hero-desc { margin: 0 auto 32px; } }
+.hero-desc strong { color: var(--chalk); font-weight: 500; }
+
+.hero-btns { display: flex; gap: 12px; flex-wrap: wrap; opacity: 0; animation: up .5s .46s forwards; }
+@media (max-width:860px) { .hero-btns { justify-content: center; } }
+
+.btn-gold { display: inline-flex; align-items: center; gap: 10px; background: var(--gold); color: #000; font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1rem; padding: 15px 30px; border-radius: 100px; box-shadow: 0 4px 22px rgba(240,192,64,.3); transition: transform .18s, box-shadow .18s; }
+.btn-gold:hover { transform: translateY(-2px); box-shadow: 0 10px 36px rgba(240,192,64,.48); }
+.btn-ghost { display: inline-flex; align-items: center; gap: 8px; border: 1px solid var(--border2); color: var(--chalk); font-size: .95rem; font-weight: 500; padding: 15px 28px; border-radius: 100px; transition: border-color .18s, background .18s; }
+.btn-ghost:hover { border-color: var(--muted2); background: rgba(255,255,255,.04); }
+
+.hero-trust { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; margin-top: 18px; font-size: .78rem; color: var(--muted2); opacity: 0; animation: up .5s .58s forwards; }
+@media (max-width:860px) { .hero-trust { justify-content: center; } }
+.trust-item::before { content: '✓ '; color: var(--jade); font-weight: 700; }
+.trust-sep { color: var(--border2); }
+
+@keyframes up { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+
+/* Hero visual — car */
+.hero-visual { position: relative; display: flex; align-items: center; justify-content: center; height: 460px; }
+.phone-glow-v { position: absolute; width: 400px; height: 400px; border-radius: 50%; background: radial-gradient(ellipse, rgba(240,192,64,.1), transparent 70%); pointer-events: none; }
+.car-svg-hero { width: 340px; filter: drop-shadow(0 24px 48px rgba(0,0,0,.6)) drop-shadow(0 0 60px rgba(240,192,64,.07)); animation: carFloat 5s ease-in-out infinite; }
+@keyframes carFloat { 0%,100%{transform:translateY(0) rotate(-1.5deg);} 50%{transform:translateY(-10px) rotate(-1.5deg);} }
+
+.road-under { width: 420px; height: 6px; border-radius: 3px; background: linear-gradient(90deg, transparent, var(--border2), var(--border2), transparent); margin-top: -6px; }
+.road-under::after { content: ''; display: block; width: 60px; height: 2px; background: var(--gold); opacity: .3; border-radius: 1px; margin: 2px auto 0; }
+
+/* Floating chips */
+.chip { position: absolute; background: var(--bg2); border: 1px solid rgba(255,255,255,.09); border-radius: 100px; padding: 8px 16px; font-size: .72rem; font-weight: 600; white-space: nowrap; display: flex; align-items: center; gap: 7px; box-shadow: 0 4px 16px rgba(0,0,0,.4); }
+.chip1 { top: 14%; right: -4%; animation: fc 4s ease-in-out infinite; }
+.chip2 { bottom: 28%; right: -6%; animation: fc 3.5s 1.2s ease-in-out infinite; }
+.chip3 { bottom: 16%; left: -2%; animation: fc 4.5s .6s ease-in-out infinite; }
+.chip-dot { width: 7px; height: 7px; border-radius: 50%; }
+.chip-dot.green { background: var(--jade); box-shadow: 0 0 6px var(--jade); }
+.chip-dot.gold { background: var(--gold); }
+@keyframes fc { 0%,100%{transform:translateY(0);} 50%{transform:translateY(-7px);} }
+
+/* WhatsApp notif */
+.wa-notif { position: absolute; top: 8%; left: -8%; background: var(--bg2); border: 1px solid rgba(255,255,255,.08); border-radius: 16px; padding: 14px 16px; display: flex; align-items: center; gap: 12px; box-shadow: 0 8px 32px rgba(0,0,0,.5); min-width: 220px; animation: fc 4s ease-in-out infinite; }
+.wa-icon { width: 38px; height: 38px; border-radius: 10px; background: rgba(37,211,102,.15); display: flex; align-items: center; justify-content: center; font-size: 1.3rem; flex-shrink: 0; }
+.wa-name { font-size: .75rem; font-weight: 700; margin-bottom: 2px; }
+.wa-msg { font-size: .68rem; color: var(--muted2); }
+.wa-live { width: 8px; height: 8px; border-radius: 50%; background: var(--jade); box-shadow: 0 0 6px var(--jade); flex-shrink: 0; }
+
+/* ═══════════════════════════════════════
+   MARQUEE STRIP
+═══════════════════════════════════════ */
+.strip { background: var(--bg2); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); padding: 18px 0; overflow: hidden; position: relative; }
+.strip::before, .strip::after { content: ''; position: absolute; top: 0; bottom: 0; width: 80px; z-index: 1; }
+.strip::before { left: 0; background: linear-gradient(to right, var(--bg2), transparent); }
+.strip::after { right: 0; background: linear-gradient(to left, var(--bg2), transparent); }
+.strip-track { display: flex; gap: 48px; width: max-content; animation: marquee 22s linear infinite; }
+.strip-item { display: flex; align-items: center; gap: 10px; font-family: 'Syne', sans-serif; font-weight: 700; font-size: .78rem; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); white-space: nowrap; }
+.strip-item .si { color: var(--gold); font-size: 1rem; }
+@keyframes marquee { from{transform:translateX(0);} to{transform:translateX(-50%);} }
+
+/* ═══════════════════════════════════════
+   SECTIONS LAYOUT
+═══════════════════════════════════════ */
+.section { padding: 96px clamp(20px,5vw,72px); }
+.container { max-width: 1100px; margin: 0 auto; }
+
+.sec-label { display: inline-flex; align-items: center; gap: 10px; font-size: .72rem; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--gold); margin-bottom: 14px; }
+.sec-label::before { content: ''; width: 26px; height: 2px; background: var(--gold); border-radius: 2px; flex-shrink: 0; }
+.sec-title { font-family: 'Syne', sans-serif; font-size: clamp(2rem, 4.5vw, 3.2rem); font-weight: 800; letter-spacing: -1.5px; line-height: 1.1; margin-bottom: 14px; }
+.sec-title .gold { color: var(--gold); }
+.sec-sub { font-size: .98rem; color: var(--muted2); max-width: 520px; line-height: 1.7; font-weight: 300; margin-bottom: 52px; }
+
+/* ═══════════════════════════════════════
+   HOW IT WORKS — 4 STEPS
+═══════════════════════════════════════ */
+.steps-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 2px; background: var(--border); border-radius: 22px; overflow: hidden; border: 1px solid var(--border); }
+@media (max-width:800px) { .steps-grid { grid-template-columns: 1fr 1fr; } }
+@media (max-width:480px) { .steps-grid { grid-template-columns: 1fr; } }
+
+.step-card { background: var(--bg2); padding: 36px 28px; position: relative; transition: background .2s; }
+.step-card:hover { background: var(--bg3); }
+.step-n { font-family: 'Syne', sans-serif; font-size: .7rem; font-weight: 800; color: var(--gold); letter-spacing: 1px; margin-bottom: 20px; display: flex; align-items: center; gap: 8px; }
+.step-n::after { content: ''; flex: 1; height: 1px; background: rgba(240,192,64,.2); }
+.step-emoji { font-size: 2.4rem; display: block; margin-bottom: 16px; }
+.step-title { font-family: 'Syne', sans-serif; font-size: 1.05rem; font-weight: 700; margin-bottom: 10px; }
+.step-desc { font-size: .86rem; color: var(--muted2); line-height: 1.65; }
+.step-desc strong { color: var(--chalk); font-weight: 500; }
+.step-accent { position: absolute; bottom: 0; left: 0; right: 0; height: 3px; background: transparent; transition: background .2s; }
+.step-card:hover .step-accent { background: var(--gold); }
+
+/* ═══════════════════════════════════════
+   CONCEPT SECTION (from About)
+═══════════════════════════════════════ */
+.concept-bg { background: var(--bg2); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+
+.concept-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 72px; align-items: center; }
+@media (max-width:760px) { .concept-layout { grid-template-columns: 1fr; gap: 40px; } }
+
+.concept-points { display: flex; flex-direction: column; gap: 24px; }
+.concept-point { display: flex; gap: 16px; align-items: flex-start; padding: 18px; border-radius: 16px; border: 1px solid transparent; transition: border-color .2s, background .2s; }
+.concept-point:hover { border-color: rgba(240,192,64,.2); background: rgba(240,192,64,.04); }
+.cp-icon { width: 44px; height: 44px; border-radius: 12px; background: rgba(240,192,64,.1); border: 1px solid rgba(240,192,64,.2); display: flex; align-items: center; justify-content: center; font-size: 1.2rem; flex-shrink: 0; margin-top: 2px; }
+.cp-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: .95rem; margin-bottom: 5px; }
+.cp-desc { font-size: .86rem; color: var(--muted2); line-height: 1.62; }
+
+/* Map mockup */
+.map-mockup { width: 100%; aspect-ratio: 1; background: #0d1420; border-radius: 24px; border: 1px solid var(--border); overflow: hidden; position: relative; max-width: 440px; margin: 0 auto; }
+.map-grid-lines { position: absolute; inset: 0; background-image: linear-gradient(rgba(255,255,255,.04) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.04) 1px, transparent 1px); background-size: 40px 40px; }
+
+.map-pin { position: absolute; top: 38%; left: 52%; transform: translate(-50%,-50%); z-index: 3; }
+.pin-body { width: 44px; height: 44px; background: var(--ember); border-radius: 50% 50% 50% 0; transform: rotate(-45deg); display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 20px rgba(255,107,53,.5); animation: pinBounce 2.5s ease-in-out infinite; }
+.pin-body::after { content: ''; width: 14px; height: 14px; background: #fff; border-radius: 50%; transform: rotate(45deg); }
+@keyframes pinBounce { 0%,100%{transform:rotate(-45deg) translateY(0);} 50%{transform:rotate(-45deg) translateY(-7px);} }
+
+.shop-dot { position: absolute; border-radius: 50%; background: var(--gold); animation: shopPulse 3s ease-in-out infinite; }
+@keyframes shopPulse { 0%,100%{opacity:1;transform:scale(1);} 50%{opacity:.6;transform:scale(.85);} }
+.shop-dot::after { content: ''; position: absolute; inset: -6px; border-radius: 50%; border: 1.5px solid rgba(240,192,64,.3); animation: ringExpand 2.2s ease-out infinite; }
+@keyframes ringExpand { from{opacity:1;transform:scale(.6);} to{opacity:0;transform:scale(2.2);} }
+
+.map-car { position: absolute; bottom: 22%; left: 18%; font-size: 1.6rem; filter: drop-shadow(0 2px 8px rgba(0,0,0,.5)); animation: carMove 4s ease-in-out infinite; }
+@keyframes carMove { 0%,100%{transform:translateX(0);} 50%{transform:translateX(18px);} }
+
+.wa-bubble { position: absolute; top: 6%; right: -8%; background: var(--bg3); border: 1px solid var(--border); border-radius: 16px 16px 16px 4px; padding: 12px 16px; font-size: .78rem; white-space: nowrap; box-shadow: 0 8px 30px rgba(0,0,0,.4); animation: floatBubble 3s ease-in-out infinite; }
+.wa-bubble-header { display: flex; align-items: center; gap: 6px; margin-bottom: 4px; color: #25D366; font-weight: 600; font-size: .72rem; }
+.wa-bubble-text { color: var(--muted2); }
+@keyframes floatBubble { 0%,100%{transform:translateY(0);} 50%{transform:translateY(-6px);} }
+
+.pay-bubble { position: absolute; bottom: 5%; right: -6%; background: var(--bg3); border: 1px solid var(--border); border-radius: 16px; padding: 14px 18px; box-shadow: 0 8px 30px rgba(0,0,0,.4); animation: floatBubble 3.5s 1s ease-in-out infinite; }
+.pay-amount { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.4rem; color: var(--gold); }
+.pay-label { font-size: .72rem; color: var(--muted2); margin-bottom: 8px; }
+.pay-pills { display: flex; gap: 6px; }
+.pay-pill { background: rgba(255,255,255,.06); border-radius: 6px; padding: 4px 10px; font-size: .7rem; color: var(--muted2); font-weight: 500; }
+
+/* ═══════════════════════════════════════
+   FEATURES GRID
+═══════════════════════════════════════ */
+.features-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+@media (max-width:900px) { .features-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width:560px) { .features-grid { grid-template-columns: 1fr; } }
+
+.feat-card { background: var(--bg2); border: 1px solid var(--border); border-radius: 20px; padding: 30px 26px; position: relative; overflow: hidden; transition: border-color .22s, transform .22s; }
+.feat-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, var(--gold), transparent); opacity: 0; transition: opacity .22s; }
+.feat-card:hover { border-color: rgba(240,192,64,.3); transform: translateY(-4px); }
+.feat-card:hover::before { opacity: 1; }
+.feat-icon { font-size: 2rem; display: block; margin-bottom: 18px; }
+.feat-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 1rem; margin-bottom: 8px; }
+.feat-desc { font-size: .86rem; color: var(--muted2); line-height: 1.65; }
+
+/* ═══════════════════════════════════════
+   CATEGORIES
+═══════════════════════════════════════ */
+.cats-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 10px; }
+.cat-card { background: var(--bg2); border: 1px solid var(--border); border-radius: 16px; padding: 20px 12px; text-align: center; transition: border-color .18s, background .18s, transform .18s; cursor: default; }
+.cat-card:hover { border-color: rgba(240,192,64,.35); background: var(--gold-d); transform: translateY(-3px); }
+.cat-emoji { font-size: 1.9rem; display: block; margin-bottom: 8px; }
+.cat-name { font-size: .76rem; font-weight: 600; color: var(--muted2); }
+.cat-card:hover .cat-name { color: var(--chalk); }
+
+/* ═══════════════════════════════════════
+   ADVANTAGES SPLIT (from About)
+═══════════════════════════════════════ */
+.adv-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+@media (max-width:640px) { .adv-grid { grid-template-columns: 1fr; } }
+
+.adv-card { background: var(--bg2); border: 1px solid var(--border); border-radius: 20px; padding: 28px; position: relative; overflow: hidden; transition: border-color .2s, transform .2s; }
+.adv-card::before { content: ''; position: absolute; inset: 0; opacity: 0; background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(240,192,64,.06), transparent); transition: opacity .3s; }
+.adv-card:hover { border-color: rgba(240,192,64,.25); transform: translateY(-3px); }
+.adv-card:hover::before { opacity: 1; }
+.adv-num { font-family: 'Syne', sans-serif; font-size: 3rem; font-weight: 800; color: rgba(240,192,64,.1); line-height: 1; margin-bottom: 10px; }
+.adv-icon { font-size: 1.8rem; margin-bottom: 12px; display: block; }
+.adv-title { font-family: 'Syne', sans-serif; font-size: 1rem; font-weight: 700; margin-bottom: 8px; }
+.adv-desc { font-size: .85rem; color: var(--muted2); line-height: 1.65; }
+.adv-tag { display: inline-flex; margin-top: 14px; padding: 3px 12px; border-radius: 100px; font-size: .68rem; font-weight: 700; background: var(--gold-d); color: var(--gold); border: 1px solid rgba(240,192,64,.18); }
+
+/* ═══════════════════════════════════════
+   CTA FINAL
+═══════════════════════════════════════ */
+.cta-section { background: var(--bg2); border-top: 1px solid var(--border); text-align: center; position: relative; overflow: hidden; }
+.cta-section::before { content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); width: 600px; height: 300px; background: radial-gradient(ellipse, rgba(240,192,64,.07), transparent 70%); pointer-events: none; }
+.cta-title { font-family: 'Syne', sans-serif; font-size: clamp(2rem, 5vw, 3.6rem); font-weight: 800; letter-spacing: -1.5px; line-height: 1.1; margin-bottom: 18px; }
+.cta-title em { font-style: normal; color: var(--gold); }
+.cta-sub { font-size: 1rem; color: var(--muted2); max-width: 440px; margin: 0 auto 40px; line-height: 1.65; font-weight: 300; }
+.cta-btns { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-bottom: 28px; }
+.cta-trust { display: flex; gap: 18px; justify-content: center; flex-wrap: wrap; }
+.cta-trust span { font-size: .78rem; color: var(--muted2); }
+.cta-trust span::before { content: '✓ '; color: var(--jade); font-weight: 700; }
+
+/* ═══════════════════════════════════════
+   FOOTER
+═══════════════════════════════════════ */
+.ns-footer { padding: 36px clamp(20px,5vw,72px); border-top: 1px solid var(--border); }
+.ns-footer-inner { max-width: 1100px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 32px; align-items: start; }
+@media (max-width:720px) { .ns-footer-inner { grid-template-columns: 1fr 1fr; } }
+@media (max-width:480px) { .ns-footer-inner { grid-template-columns: 1fr; gap: 24px; } }
+
+.ns-footer-logo { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1rem; letter-spacing: -.3px; margin-bottom: 6px; }
+.ns-footer-logo .g { color: var(--gold); }
+.ns-footer-copy { font-size: .76rem; color: var(--muted); line-height: 1.5; }
+
+.ns-footer-col h4 { font-family: 'Syne', sans-serif; font-weight: 700; font-size: .78rem; letter-spacing: .5px; text-transform: uppercase; color: var(--muted2); margin-bottom: 14px; }
+.ns-footer-col a { display: block; font-size: .82rem; color: var(--muted); margin-bottom: 9px; transition: color .15s; }
+.ns-footer-col a:hover { color: var(--chalk); }
+
+.ns-footer-bottom { max-width: 1100px; margin: 24px auto 0; padding-top: 20px; border-top: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+.ns-footer-bottom-links { display: flex; gap: 16px; flex-wrap: wrap; }
+.ns-footer-bottom-links a { font-size: .75rem; color: var(--muted); transition: color .15s; }
+.ns-footer-bottom-links a:hover { color: var(--chalk); }
+.ns-footer-legal-copy { font-size: .72rem; color: var(--muted); }
+
+/* ═══════════════════════════════════════
+   STICKY MOBILE CTA
+═══════════════════════════════════════ */
+.sticky-cta { display: none; position: fixed; bottom: 0; left: 0; right: 0; z-index: 400; background: rgba(8,11,18,.96); border-top: 1px solid rgba(240,192,64,.15); backdrop-filter: blur(20px); padding: 12px 20px; }
+@media (max-width:640px) { .sticky-cta { display: block; } }
+.sticky-cta a { display: flex; align-items: center; justify-content: center; gap: 10px; background: var(--gold); color: #000; font-family: 'Syne', sans-serif; font-weight: 800; font-size: .95rem; padding: 15px; border-radius: 14px; box-shadow: 0 4px 16px rgba(240,192,64,.4); }
+
+/* ═══════════════════════════════════════
+   REVEAL
+═══════════════════════════════════════ */
+.rev { opacity: 0; transform: translateY(28px); transition: opacity .7s ease, transform .7s ease; }
+.rev.in { opacity: 1; transform: translateY(0); }
+/* Sections ciblées via ancre (#comment, #concept...) toujours visibles */
+section:target .rev, section:target.rev { opacity: 1; transform: none; }
+.d1{transition-delay:.1s;} .d2{transition-delay:.2s;} .d3{transition-delay:.3s;} .d4{transition-delay:.4s;}
+</style>
+</head>
+<body>
+
+<!-- ════════ SHARED NAV ════════ -->
+<nav class="ns-nav" id="nsNav">
+  <a href="landing.html" class="ns-logo"><span class="ns-logo-dot">•</span>Near<span class="ns-logo-shop">Shop</span>&nbsp;Drive</a>
+  <div class="ns-links">
+    <a href="landing.html" class="ns-link active">Accueil</a>
+    <a href="#comment" class="ns-link">Comment ça marche</a>
+    <a href="#concept" class="ns-link">Le concept</a>
+    <a href="#fonctionnalites" class="ns-link">Fonctionnalités</a>
+    <a href="inscription.html" class="ns-link">Inscrire mon commerce</a>
+    <a href="inscription.html" class="ns-link">Inscrire mon commerce</a>
+  <a href="legal.html" class="ns-link">Légal</a>
+  </div>
+  <div class="ns-nav-right">
+    <a href="app.html" class="ns-cta">🗺️ Ouvrir la carte</a>
+    <button class="ns-burger" id="nsBurger" aria-label="Menu"><span></span><span></span><span></span></button>
+  </div>
+</nav>
+<!-- Mobile drawer -->
+<div class="ns-drawer" id="nsDrawer">
+  <a href="landing.html" class="ns-link active">Accueil</a>
+  <a href="#comment" class="ns-link">Comment ça marche</a>
+  <a href="#concept" class="ns-link">Le concept</a>
+  <a href="#fonctionnalites" class="ns-link">Fonctionnalités</a>
+  <a href="legal.html" class="ns-link">Légal</a>
+  <a href="app.html" class="ns-cta">🗺️ Ouvrir la carte</a>
+</div>
+
+<!-- ════════ HERO ════════ -->
+<div class="hero-road-bg"></div>
+<section class="hero">
+  <div>
+    <div class="hero-badge"><span class="pulse"></span>Nouveau concept · Drive local</div>
+    <h1 class="hero-title">Restez dans<br>votre <em>voiture</em>. 🚗<br>On vous livre.</h1>
+    <p class="hero-desc">NearShop Drive répertorie les commerces locaux qui <strong>livrent directement à votre véhicule</strong>. Localisez, sélectionnez, commandez via WhatsApp — et restez <strong>confortablement installé</strong>.</p>
+    <div class="hero-btns">
+      <a href="app.html" class="btn-gold">🗺️ Trouver un commerce Drive</a>
+      <a href="#comment" class="btn-ghost">Comment ça marche ?</a>
+    </div>
+    <div class="hero-trust">
+      <span class="trust-item">Sans sortir de voiture</span>
+      <span class="trust-sep">·</span>
+      <span class="trust-item">Via WhatsApp</span>
+      <span class="trust-sep">·</span>
+      <span class="trust-item">100% gratuit</span>
+    </div>
+  </div>
+  <div class="hero-visual">
+    <div class="phone-glow-v"></div>
+    <!-- WhatsApp notif -->
+    <div class="wa-notif">
+      <div class="wa-icon">💬</div>
+      <div><div class="wa-name">Épicerie Al Warda</div><div class="wa-msg">Votre commande arrive dans 3 min 🛵</div></div>
+      <div class="wa-live"></div>
+    </div>
+    <!-- Chips -->
+    <div class="chip chip1"><span class="chip-dot gold"></span>📍 280m de vous</div>
+    <div class="chip chip2"><span class="chip-dot green"></span>✅ Drive disponible</div>
+    <div class="chip chip3">⭐ 4.8 · 42 avis</div>
+    <!-- Car SVG -->
+    <div style="display:flex;flex-direction:column;align-items:center;">
+      <svg class="car-svg-hero" viewBox="0 0 400 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <ellipse cx="200" cy="188" rx="162" ry="9" fill="rgba(0,0,0,.35)"/>
+        <rect x="40" y="110" width="320" height="68" rx="16" fill="#1e2235"/>
+        <path d="M100 110 C115 72 145 58 200 56 C255 58 285 72 300 110 Z" fill="#252a3d"/>
+        <path d="M130 108 C142 80 162 68 200 66 C238 68 258 80 270 108 Z" fill="rgba(56,189,248,.14)" stroke="rgba(56,189,248,.28)" stroke-width="1.5"/>
+        <rect x="108" y="77" width="54" height="31" rx="6" fill="rgba(56,189,248,.1)" stroke="rgba(56,189,248,.22)" stroke-width="1.5"/>
+        <rect x="238" y="77" width="54" height="31" rx="6" fill="rgba(56,189,248,.1)" stroke="rgba(56,189,248,.22)" stroke-width="1.5"/>
+        <line x1="50" y1="138" x2="350" y2="138" stroke="rgba(240,192,64,.18)" stroke-width="1.5"/>
+        <line x1="193" y1="110" x2="193" y2="178" stroke="rgba(255,255,255,.07)" stroke-width="1.5"/>
+        <rect x="44" y="117" width="28" height="14" rx="7" fill="#f0c040" opacity=".9"/>
+        <ellipse cx="28" cy="124" rx="42" ry="12" fill="url(#hgl)" opacity=".25" transform="rotate(-5 28 124)"/>
+        <rect x="328" y="117" width="28" height="14" rx="7" fill="#e53935" opacity=".8"/>
+        <rect x="153" y="140" width="20" height="5" rx="2.5" fill="rgba(240,192,64,.4)"/>
+        <rect x="222" y="140" width="20" height="5" rx="2.5" fill="rgba(240,192,64,.4)"/>
+        <circle cx="108" cy="178" r="22" fill="#141620" stroke="#2a2f45" stroke-width="3"/>
+        <circle cx="108" cy="178" r="13" fill="#1e2235" stroke="rgba(240,192,64,.3)" stroke-width="2"/>
+        <circle cx="108" cy="178" r="4" fill="rgba(240,192,64,.5)"/>
+        <circle cx="292" cy="178" r="22" fill="#141620" stroke="#2a2f45" stroke-width="3"/>
+        <circle cx="292" cy="178" r="13" fill="#1e2235" stroke="rgba(240,192,64,.3)" stroke-width="2"/>
+        <circle cx="292" cy="178" r="4" fill="rgba(240,192,64,.5)"/>
+        <rect x="140" y="152" width="54" height="16" rx="8" fill="rgba(240,192,64,.12)" stroke="rgba(240,192,64,.25)" stroke-width="1"/>
+        <text x="167" y="163" fill="#f0c040" font-size="7" font-family="Syne,sans-serif" font-weight="700" text-anchor="middle">DRIVE</text>
+        <defs><radialGradient id="hgl" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#f0c040" stop-opacity=".8"/><stop offset="100%" stop-color="#f0c040" stop-opacity="0"/></radialGradient></defs>
+      </svg>
+      <div class="road-under"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════ MARQUEE ════════ -->
+<div class="strip">
+  <div class="strip-track" id="stripTrack"></div>
+</div>
+
+<!-- ════════ HOW IT WORKS ════════ -->
+<section class="section rev" id="comment">
+  <div class="container">
+    <div class="sec-label">Comment ça marche</div>
+    <h2 class="sec-title">4 étapes, <span class="gold">zéro effort.</span></h2>
+    <p class="sec-sub">Du parking au produit dans votre main — sans quitter votre siège.</p>
+    <div class="steps-grid rev d1">
+      <div class="step-card">
+        <div class="step-n">ÉTAPE 01</div>
+        <span class="step-emoji">📍</span>
+        <div class="step-title">Localisez-vous</div>
+        <p class="step-desc">Activez votre GPS ou cherchez une ville. La carte affiche tous les <strong>commerces Drive</strong> dans votre rayon.</p>
+        <div class="step-accent"></div>
+      </div>
+      <div class="step-card">
+        <div class="step-n">ÉTAPE 02</div>
+        <span class="step-emoji">🏪</span>
+        <div class="step-title">Choisissez un commerce</div>
+        <p class="step-desc">Consultez la fiche : horaires, photos, avis clients, distance. Ajoutez vos <strong>favoris</strong> pour les retrouver.</p>
+        <div class="step-accent"></div>
+      </div>
+      <div class="step-card">
+        <div class="step-n">ÉTAPE 03</div>
+        <span class="step-emoji">💬</span>
+        <div class="step-title">Commandez via WhatsApp</div>
+        <p class="step-desc">Un tap ouvre <strong>WhatsApp</strong> directement avec le commerçant. Donnez votre commande et attendez la confirmation.</p>
+        <div class="step-accent"></div>
+      </div>
+      <div class="step-card">
+        <div class="step-n">ÉTAPE 04</div>
+        <span class="step-emoji">🚗</span>
+        <div class="step-title">Récupérez à votre voiture</div>
+        <p class="step-desc">Le commerçant vient <strong>jusqu'à vous</strong>. Payez cash ou mobile — sans jamais quitter votre véhicule.</p>
+        <div class="step-accent"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════ CONCEPT (from About) ════════ -->
+<section class="section concept-bg rev" id="concept">
+  <div class="container">
+    <div class="concept-layout">
+      <div>
+        <div class="sec-label">Le concept</div>
+        <h2 class="sec-title">Le <span class="gold">Drive</span> réinventé pour les petits commerces.</h2>
+        <p class="sec-sub" style="margin-bottom:32px;">Pas de plateforme géante. Pas de commission. Juste votre commerçant de quartier, au plus proche.</p>
+        <div class="concept-points">
+          <div class="concept-point">
+            <div class="cp-icon">🗺️</div>
+            <div><div class="cp-title">Carte interactive en temps réel</div><p class="cp-desc">Visualisez tous les commerces participants autour de vous. Filtrez par catégorie, distance, statut ouvert/fermé.</p></div>
+          </div>
+          <div class="concept-point">
+            <div class="cp-icon">💬</div>
+            <div><div class="cp-title">Commande directe sans intermédiaire</div><p class="cp-desc">Pas d'app supplémentaire, pas de commission. Vous contactez le commerçant directement sur WhatsApp.</p></div>
+          </div>
+          <div class="concept-point">
+            <div class="cp-icon">💵</div>
+            <div><div class="cp-title">Paiement flexible</div><p class="cp-desc">Cash ou paiement mobile — le commerçant vous communique le montant avant de venir. Pas de surprise.</p></div>
+          </div>
+          <div class="concept-point">
+            <div class="cp-icon">⭐</div>
+            <div><div class="cp-title">Communauté d'avis</div><p class="cp-desc">Chaque utilisateur peut noter et commenter les commerces. La qualité de service est visible par tous.</p></div>
+          </div>
+        </div>
+      </div>
+      <!-- Map mockup (from About) -->
+      <div style="position:relative;max-width:440px;margin:0 auto;width:100%;">
+        <div class="map-mockup">
+          <div class="map-grid-lines"></div>
+          <svg style="position:absolute;inset:0;width:100%;height:100%;" viewBox="0 0 440 440" fill="none">
+            <line x1="0" y1="220" x2="440" y2="220" stroke="#1a2540" stroke-width="16"/>
+            <line x1="220" y1="0" x2="220" y2="440" stroke="#1a2540" stroke-width="16"/>
+            <line x1="0" y1="140" x2="440" y2="140" stroke="#141c2e" stroke-width="8"/>
+            <line x1="0" y1="300" x2="440" y2="300" stroke="#141c2e" stroke-width="8"/>
+            <line x1="140" y1="0" x2="140" y2="440" stroke="#141c2e" stroke-width="8"/>
+            <line x1="300" y1="0" x2="300" y2="440" stroke="#141c2e" stroke-width="8"/>
+            <rect x="30" y="30" width="90" height="90" rx="6" fill="#111820"/>
+            <rect x="160" y="30" width="45" height="90" rx="4" fill="#111820"/>
+            <rect x="230" y="30" width="55" height="90" rx="4" fill="#111820"/>
+            <rect x="310" y="50" width="110" height="70" rx="6" fill="#111820"/>
+            <rect x="30" y="160" width="90" height="45" rx="4" fill="#111820"/>
+            <rect x="30" y="230" width="90" height="50" rx="4" fill="#111820"/>
+            <rect x="30" y="310" width="90" height="100" rx="6" fill="#111820"/>
+            <rect x="310" y="160" width="110" height="40" rx="4" fill="#111820"/>
+            <rect x="310" y="230" width="110" height="110" rx="6" fill="#111820"/>
+            <rect x="160" y="310" width="120" height="100" rx="6" fill="#111820"/>
+            <rect x="160" y="230" width="120" height="50" rx="4" fill="#0d1f18"/>
+          </svg>
+          <div class="map-pin"><div class="pin-body"></div></div>
+          <div class="shop-dot" style="width:14px;height:14px;top:22%;left:35%;animation-delay:.3s"></div>
+          <div class="shop-dot" style="width:12px;height:12px;top:58%;left:72%;animation-delay:.8s"></div>
+          <div class="shop-dot" style="width:13px;height:13px;top:75%;left:28%;animation-delay:1.3s"></div>
+          <div class="shop-dot" style="width:11px;height:11px;top:30%;left:70%;animation-delay:.5s"></div>
+          <div class="map-car">🚗</div>
+        </div>
+        <div class="wa-bubble">
+          <div class="wa-bubble-header">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="#25D366"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a8.62 8.62 0 00-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413z"/></svg>
+            Boulangerie Samir
+          </div>
+          <div class="wa-bubble-text">Bonjour, 2 baguettes s'il vous plaît 🥖</div>
+        </div>
+        <div class="pay-bubble">
+          <div class="pay-label">Montant à payer</div>
+          <div class="pay-amount">3,80 €</div>
+          <div class="pay-pills"><div class="pay-pill">💵 Cash</div><div class="pay-pill">📱 Mobile</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════ FEATURES ════════ -->
+<section class="section rev" id="fonctionnalites">
+  <div class="container">
+    <div class="sec-label">Fonctionnalités</div>
+    <h2 class="sec-title">Tout pour <span class="gold">simplifier</span> vos courses.</h2>
+    <p class="sec-sub">Une app conçue pour être rapide et efficace, même sur une connexion lente.</p>
+    <div class="features-grid">
+      <div class="feat-card rev"><span class="feat-icon">🔍</span><div class="feat-title">Recherche par rayon</div><p class="feat-desc">Définissez votre rayon de 1 à 20 km. Voyez tous les commerces Drive disponibles autour de vous.</p></div>
+      <div class="feat-card rev d1"><span class="feat-icon">❤️</span><div class="feat-title">Favoris synchronisés</div><p class="feat-desc">Sauvegardez vos commerces préférés. Retrouvez-les en un tap, même sans connexion internet.</p></div>
+      <div class="feat-card rev d2"><span class="feat-icon">⭐</span><div class="feat-title">Avis & notes</div><p class="feat-desc">Lisez et déposez des avis vérifiés. La note moyenne est visible directement sur la carte.</p></div>
+      <div class="feat-card rev d3"><span class="feat-icon">🕐</span><div class="feat-title">Horaires en temps réel</div><p class="feat-desc">Chaque fiche affiche les horaires d'ouverture et indique si le commerce est ouvert maintenant.</p></div>
+      <div class="feat-card rev"><span class="feat-icon">🌍</span><div class="feat-title">4 langues · Multi-ville</div><p class="feat-desc">FR, NL, EN, AR avec support RTL. Recherchez n'importe quelle ville pour planifier à l'avance.</p></div>
+      <div class="feat-card rev d1"><span class="feat-icon">📱</span><div class="feat-title">PWA · Sans installation</div><p class="feat-desc">S'ouvre dans votre navigateur. Installez l'icône sur l'écran d'accueil. Fonctionne hors ligne.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════ CATEGORIES ════════ -->
+<section class="section rev" style="padding-top:0;">
+  <div class="container">
+    <div class="sec-label">Catégories</div>
+    <h2 class="sec-title">Tout livré <span class="gold">à votre voiture.</span></h2>
+    <p class="sec-sub" style="margin-bottom:36px;">Des dizaines de types de commerces référencés sur NearShop Drive.</p>
+    <div class="cats-grid rev d1">
+      <div class="cat-card"><span class="cat-emoji">🛒</span><div class="cat-name">Épiceries</div></div>
+      <div class="cat-card"><span class="cat-emoji">🥖</span><div class="cat-name">Boulangeries</div></div>
+      <div class="cat-card"><span class="cat-emoji">🥩</span><div class="cat-name">Boucheries</div></div>
+      <div class="cat-card"><span class="cat-emoji">🍕</span><div class="cat-name">Restaurants</div></div>
+      <div class="cat-card"><span class="cat-emoji">☕</span><div class="cat-name">Cafés</div></div>
+      <div class="cat-card"><span class="cat-emoji">🧁</span><div class="cat-name">Pâtisseries</div></div>
+      <div class="cat-card"><span class="cat-emoji">🌿</span><div class="cat-name">Herboristeries</div></div>
+      <div class="cat-card"><span class="cat-emoji">💊</span><div class="cat-name">Pharmacies</div></div>
+      <div class="cat-card"><span class="cat-emoji">🌸</span><div class="cat-name">Fleuristes</div></div>
+      <div class="cat-card"><span class="cat-emoji">📱</span><div class="cat-name">High-Tech</div></div>
+      <div class="cat-card"><span class="cat-emoji">🧴</span><div class="cat-name">Cosmétiques</div></div>
+      <div class="cat-card"><span class="cat-emoji">🫖</span><div class="cat-name">Épices & Thés</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════ ADVANTAGES ════════ -->
+<section class="section concept-bg rev" style="padding-top:80px;">
+  <div class="container">
+    <div class="sec-label">Pourquoi NearShop Drive</div>
+    <h2 class="sec-title">Zéro friction, <span class="gold">zéro stress.</span></h2>
+    <p class="sec-sub">Plus simple, plus rapide et plus humain que n'importe quelle app de livraison.</p>
+    <div class="adv-grid rev d1">
+      <div class="adv-card"><div class="adv-num">01</div><span class="adv-icon">⚡</span><div class="adv-title">Rapide comme un coup de klaxon</div><p class="adv-desc">Ouvrez la carte, choisissez un commerce, envoyez un WhatsApp. De la recherche à la livraison en moins de 5 minutes.</p><span class="adv-tag">Sans attente</span></div>
+      <div class="adv-card"><div class="adv-num">02</div><span class="adv-icon">💸</span><div class="adv-title">Prix du marché, sans commission</div><p class="adv-desc">Vous commandez directement auprès du commerçant. Pas d'intermédiaire, pas de frais cachés.</p><span class="adv-tag">0% de commission</span></div>
+      <div class="adv-card"><div class="adv-num">03</div><span class="adv-icon">🤝</span><div class="adv-title">Soutenir le commerce local</div><p class="adv-desc">Chaque commande va directement dans la poche du commerçant de votre quartier. Pas dans celle d'une multinationale.</p><span class="adv-tag">Proximité</span></div>
+      <div class="adv-card"><div class="adv-num">04</div><span class="adv-icon">📵</span><div class="adv-title">Zéro app à installer</div><p class="adv-desc">Fonctionne dans votre navigateur. Ouvrez le lien, c'est prêt. Installez l'icône si vous voulez.</p><span class="adv-tag">PWA</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════ CTA FINAL ════════ -->
+<section class="section cta-section rev">
+  <div class="container">
+    <div class="sec-label" style="justify-content:center;">Prêt ?</div>
+    <h2 class="cta-title">Essayez maintenant,<br><em>c'est gratuit.</em></h2>
+    <p class="cta-sub">Aucune inscription nécessaire pour explorer la carte. Connectez-vous pour sauvegarder vos favoris et laisser des avis.</p>
+    <div class="cta-btns rev d1">
+      <a href="app.html" class="btn-gold">🗺️ Ouvrir NearShop Drive</a>
+      <a href="app.html#register" class="btn-ghost">🏪 Inscrire mon commerce</a>
+    </div>
+    <div class="cta-trust rev d2">
+      <span>Sans sortir de voiture</span>
+      <span>Via WhatsApp</span>
+      <span>Commerces vérifiés</span>
+      <span>100% gratuit</span>
+    </div>
+  </div>
+</section>
+
+<!-- ════════ FOOTER ════════ -->
+<footer class="ns-footer">
+  <div class="ns-footer-inner">
+    <div>
+      <div class="ns-footer-logo"><span class="g">•</span>Near<span class="g">Shop</span>&nbsp;Drive</div>
+      <p class="ns-footer-copy">Les commerces locaux livrés à votre véhicule.<br>Agadir, Maroc · 2026</p>
+    </div>
+    <div class="ns-footer-col">
+      <h4>Navigation</h4>
+      <a href="landing.html">Accueil</a>
+      <a href="#comment">Comment ça marche</a>
+      <a href="#concept">Le concept</a>
+      <a href="#fonctionnalites">Fonctionnalités</a>
+      <a href="app.html">Ouvrir la carte</a>
+    </div>
+    <div class="ns-footer-col">
+      <h4>Informations</h4>
+      <a href="legal.html">Mentions légales</a>
+      <a href="legal.html#confidentialite">Confidentialité</a>
+      <a href="legal.html#cgu">CGU</a>
+      <a href="legal.html#cookies">Cookies</a>
+      <a href="mailto:nearshopdrive@gmail.com">Contact</a>
+    </div>
+  </div>
+  <div class="ns-footer-bottom">
+    <div class="ns-footer-legal-copy">© 2026 NearShop Drive — Tous droits réservés</div>
+    <div class="ns-footer-bottom-links">
+      <a href="legal.html">Mentions légales</a>
+      <a href="legal.html#confidentialite">Confidentialité</a>
+      <a href="legal.html#cgu">CGU</a>
+    </div>
+  </div>
+</footer>
+
+<!-- STICKY MOBILE CTA -->
+<div class="sticky-cta">
+  <a href="app.html">🚗 Trouver un commerce Drive près de moi →</a>
+</div>
+
+<script>
+/* ── Nav scroll ── */
+const nsNav = document.getElementById('nsNav');
+window.addEventListener('scroll', () => nsNav.classList.toggle('solid', window.scrollY > 30), { passive: true });
+
+/* ── Burger / drawer ── */
+const burger = document.getElementById('nsBurger');
+const drawer = document.getElementById('nsDrawer');
+burger.addEventListener('click', () => {
+  burger.classList.toggle('open');
+  drawer.classList.toggle('open');
+});
+drawer.querySelectorAll('a').forEach(a => a.addEventListener('click', () => {
+  burger.classList.remove('open');
+  drawer.classList.remove('open');
+}));
+
+/* ── Scroll reveal ── */
+function revealVisible() {
+  document.querySelectorAll('.rev:not(.in)').forEach(el => {
+    const r = el.getBoundingClientRect();
+    if (r.top < window.innerHeight + 60 && r.bottom > -60) el.classList.add('in');
+  });
+}
+const obs = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('in'); });
+}, { threshold: 0.01 });
+document.querySelectorAll('.rev').forEach(el => obs.observe(el));
+// Reveal on load, scroll, and hash change
+revealVisible();
+window.addEventListener('load', revealVisible);
+window.addEventListener('scroll', revealVisible, { passive: true });
+window.addEventListener('hashchange', () => setTimeout(revealVisible, 50));
+
+/* ── Marquee ── */
+const items = [
+  '📍 Localisez-vous','🏪 Commerces proches','💬 Commandez via WhatsApp',
+  '🚗 Livré à votre voiture','💵 Cash ou paiement mobile','⭐ Notez le service',
+  '🛒 Épiceries','🥖 Boulangeries','☕ Cafés','🥩 Boucheries','🌿 Herboristeries','🧁 Pâtisseries',
+];
+const track = document.getElementById('stripTrack');
+[...items, ...items].forEach(t => {
+  const d = document.createElement('div');
+  d.className = 'strip-ite
