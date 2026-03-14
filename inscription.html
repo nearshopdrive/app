@@ -451,10 +451,16 @@ drawer.querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>{burger.c
 let map,marker,siTimer;
 function goldIcon(){return L.divIcon({html:'<div style="width:30px;height:30px;background:#f0c040;border-radius:50% 50% 50% 0;transform:rotate(-45deg);border:3px solid #fff;box-shadow:0 3px 12px rgba(0,0,0,.5);"></div>',className:'',iconSize:[30,30],iconAnchor:[15,30]});}
 function initMap(){
-  if(map){map.invalidateSize();return;}
+  const el = document.getElementById('pickerMap');
+  if (!el) return;
+  if(map){
+    setTimeout(() => map.invalidateSize(), 50);
+    return;
+  }
   map=L.map('pickerMap',{zoomControl:true}).setView([30.4202,-9.5982],14);
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'&#169; <a href="https://openstreetmap.org">OpenStreetMap</a>',maxZoom:19}).addTo(map);
   map.on('click',e=>placeMarker(e.latlng.lat,e.latlng.lng,true));
+  setTimeout(() => map.invalidateSize(), 100);
 }
 function placeMarker(lat,lng,doReverse){
   if(marker)map.removeLayer(marker);
@@ -574,7 +580,7 @@ function setStep(n){
   });
   window.scrollTo({top:0,behavior:'smooth'});
 }
-function goStep(n){setStep(n);if(n===1)setTimeout(()=>{if(map)map.invalidateSize();},250);}
+function goStep(n){setStep(n);if(n===1)setTimeout(()=>{if(map){map.invalidateSize();}else{tryInitMap();}},300);}
 function goStep2(){
   let ok=true;
   const name=document.getElementById('f-name').value.trim();
@@ -630,7 +636,18 @@ async function submitForm(){
   }
 }
 function showSuc(){document.getElementById('progBar').style.display='none';document.getElementById('step3').style.display='none';document.getElementById('sucScreen').classList.add('show');}
-window.addEventListener('load',()=>setTimeout(initMap,300));
+// Init carte : on attend que le conteneur soit visible
+function tryInitMap() {
+  const el = document.getElementById('pickerMap');
+  if (!el) return;
+  const rect = el.getBoundingClientRect();
+  if (rect.width > 0) {
+    initMap();
+  } else {
+    setTimeout(tryInitMap, 100);
+  }
+}
+window.addEventListener('load', () => setTimeout(tryInitMap, 200));
 </script>
 </body>
 </html>
