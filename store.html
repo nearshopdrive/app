@@ -154,6 +154,18 @@
 .ns-drawer .ns-cta-btn{text-align:center;padding:13px;border-radius:12px;margin-top:8px;display:block;}
 @media(max-width:860px){.ns-links{display:none;}.ns-burger{display:flex;}}
 @media(max-width:500px){.ns-nav .ns-cta-btn{display:none;}}
+
+/* ── SWITCHERS LANG/THEME ── */
+.ns-switchers{display:flex;align-items:center;gap:4px;}
+.sw-btn{display:flex;align-items:center;gap:4px;background:transparent;border:1px solid var(--bdr,#1e2840);border-radius:100px;padding:4px 10px;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:.72rem;font-weight:600;color:var(--muted,#5a6680);transition:all .18s;white-space:nowrap;}
+.sw-btn:hover,.sw-btn.active{border-color:#f0c040;color:#f0c040;}
+.sw-btn.active{background:rgba(240,192,64,.08);}
+.sw-sep{width:1px;height:16px;background:var(--bdr,#1e2840);margin:0 2px;}
+.drawer-switchers{display:flex;gap:8px;padding:10px 16px 4px;flex-wrap:wrap;border-top:1px solid var(--bdr,#1e2840);margin-top:8px;}
+.drawer-switchers .sw-btn{font-size:.82rem;padding:7px 14px;}
+html[data-theme="light"]{--bg:#f5f6fa!important;--bg2:#fff!important;--bg3:#eef0f5!important;--bdr:#d6dae6!important;--chalk:#0d1120!important;}
+html[data-theme="light"] body{background:#f5f6fa;color:#0d1120;}
+html[lang="ar"]{direction:rtl;}
 </style>
 </head>
 <body>
@@ -595,6 +607,11 @@ document.getElementById('storeHero').addEventListener('touchend', e => {
     drawer.querySelectorAll('a').forEach(function(a){a.addEventListener('click',function(){burger.classList.remove('open');drawer.classList.remove('open');});});
   }
 })();
+
+function setLang(l){document.documentElement.lang=l;try{localStorage.setItem('ns_lang',l);}catch(e){}document.querySelectorAll('.sw-lang-fr').forEach(b=>b.classList.toggle('active',l==='fr'));document.querySelectorAll('.sw-lang-ar').forEach(b=>b.classList.toggle('active',l==='ar'));}
+function setTheme(t){document.documentElement.setAttribute('data-theme',t);try{localStorage.setItem('ns_theme',t);}catch(e){}document.querySelectorAll('.sw-th-dark').forEach(b=>b.classList.toggle('active',t==='dark'));document.querySelectorAll('.sw-th-light').forEach(b=>b.classList.toggle('active',t==='light'));}
+(function(){try{const t=localStorage.getItem('ns_theme'),l=localStorage.getItem('ns_lang');if(t&&t!=='dark')setTheme(t);if(l&&l!=='fr')setLang(l);}catch(e){}})();
+
 </script>
 </body>
 </html>
