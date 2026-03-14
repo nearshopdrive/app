@@ -27,6 +27,13 @@
   --muted2:  #8090aa;
   --r:       14px;
 }
+/* ── BOUTONS LANG / THEME (même style que app.html) ── */
+.lang-btn{padding:0 12px;height:36px;border-radius:10px;border:1px solid var(--border,#1e2840);background:var(--bg2,#10131b);color:var(--chalk,#eef0f5);font-family:'Syne',sans-serif;font-weight:700;font-size:.78rem;cursor:pointer;transition:all .2s;display:inline-flex;align-items:center;gap:5px;white-space:nowrap;}
+.lang-btn:hover{border-color:var(--gold,#f0c040);color:var(--gold,#f0c040);}
+.icon-btn{width:36px;height:36px;border-radius:10px;border:1px solid var(--border,#1e2840);background:var(--bg2,#10131b);color:var(--chalk,#eef0f5);font-size:1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;}
+.icon-btn:hover{border-color:var(--gold,#f0c040);color:var(--gold,#f0c040);}
+@media(max-width:860px){.lang-btn,.icon-btn{height:32px;font-size:.72rem;}}
+
 /* LIGHT THEME */
 html[data-theme="light"] {
   --bg:      #f5f6fa;
@@ -459,13 +466,8 @@ section:target .rev, section:target.rev { opacity: 1; transform: none; }
   <a href="legal.html" class="ns-link">Légal</a>
   </div>
   <div class="ns-nav-right">
-    <div class="ns-switchers">
-      <button class="sw-btn sw-lang-fr active" onclick="setLang('fr')">🇫🇷 FR</button>
-      <button class="sw-btn sw-lang-ar"        onclick="setLang('ar')">🇲🇦 AR</button>
-      <div class="sw-sep"></div>
-      <button class="sw-btn sw-th-dark  active" onclick="setTheme('dark')">🌙</button>
-      <button class="sw-btn sw-th-light"        onclick="setTheme('light')">☀️</button>
-    </div>
+    <button class="lang-btn" onclick="cycleLang()">🌍 <span id="langLabel">FR</span></button>
+    <button class="icon-btn" onclick="toggleTheme()" title="Thème">🌗</button>
     <a href="app.html" class="ns-cta">🗺️ Ouvrir la carte</a>
     <button class="ns-burger" id="nsBurger" aria-label="Menu"><span></span><span></span><span></span></button>
   </div>
@@ -479,11 +481,9 @@ section:target .rev, section:target.rev { opacity: 1; transform: none; }
   <a href="inscription.html" class="ns-link" data-i18n="nav_register">Inscrire mon commerce</a>
   <a href="legal.html" class="ns-link">Légal</a>
   <a href="app.html" class="ns-cta">🗺️ Ouvrir la carte</a>
-  <div class="drawer-switchers">
-    <button class="sw-btn sw-lang-fr active" onclick="setLang('fr')">🇫🇷 Français</button>
-    <button class="sw-btn sw-lang-ar"        onclick="setLang('ar')">🇲🇦 العربية</button>
-    <button class="sw-btn sw-th-dark  active" onclick="setTheme('dark')">🌙 Sombre</button>
-    <button class="sw-btn sw-th-light"        onclick="setTheme('light')">☀️ Clair</button>
+  <div style="display:flex;gap:8px;padding:10px 16px 4px;border-top:1px solid var(--border);margin-top:8px;">
+    <button class="lang-btn" onclick="cycleLang()" style="flex:1;display:flex;align-items:center;justify-content:center;gap:6px;">🌍 <span id="langLabelM">FR</span></button>
+    <button class="icon-btn" onclick="toggleTheme()" style="flex-shrink:0;">🌗</button>
   </div>
 </div>
 
@@ -826,28 +826,64 @@ if (track) {
   track.innerHTML = doubled.map(i => `<span class="strip-item"><span class="si">→</span>${i}</span>`).join('');
 }
 
-/* ══ LANGUE & THEME ══ */
-function setLang(lang) {
-  document.documentElement.lang = lang;
-  try { localStorage.setItem('ns_lang', lang); } catch(e) {}
-  document.querySelectorAll('.sw-lang-fr').forEach(b => b.classList.toggle('active', lang === 'fr'));
-  document.querySelectorAll('.sw-lang-ar').forEach(b => b.classList.toggle('active', lang === 'ar'));
+/* ══ LANGUE (cycle FR → EN → AR comme app.html) ══ */
+const LANGS = ['fr','en','ar'];
+const LANG_LABELS = { fr:'FR', en:'EN', ar:'عر' };
+const LANG_RTL    = { ar: true };
+let langIdx = 0;
+
+const T_INDEX = {
+  fr: { nav_home:'Accueil', nav_how:'Comment ça marche', nav_concept:'Le concept',
+        nav_feat:'Fonctionnalités', nav_register:'Inscrire mon commerce' },
+  en: { nav_home:'Home', nav_how:'How it works', nav_concept:'The concept',
+        nav_feat:'Features', nav_register:'Register my store' },
+  ar: { nav_home:'الرئيسية', nav_how:'كيف يعمل', nav_concept:'المفهوم',
+        nav_feat:'الميزات', nav_register:'سجّل تجارتك' }
+};
+
+function applyLang() {
+  const l = LANGS[langIdx];
+  // Mettre à jour le label sur tous les boutons langue
+  document.querySelectorAll('#langLabel,#langLabelM').forEach(el => {
+    el.textContent = LANG_LABELS[l] || l.toUpperCase();
+  });
+  // RTL
+  document.documentElement.setAttribute('dir', LANG_RTL[l] ? 'rtl' : 'ltr');
+  document.documentElement.lang = l;
+  // Traduire les éléments data-i18n
+  const t = T_INDEX[l] || T_INDEX.fr;
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const k = el.getAttribute('data-i18n');
+    if (t[k]) el.textContent = t[k];
+  });
+  try { localStorage.setItem('nearshop_lang', l); } catch(e) {}
 }
 
-function setTheme(theme) {
-  document.documentElement.setAttribute('data-theme', theme);
-  try { localStorage.setItem('ns_theme', theme); } catch(e) {}
-  document.querySelectorAll('.sw-th-dark').forEach(b  => b.classList.toggle('active', theme === 'dark'));
-  document.querySelectorAll('.sw-th-light').forEach(b => b.classList.toggle('active', theme === 'light'));
+function cycleLang() {
+  langIdx = (langIdx + 1) % LANGS.length;
+  applyLang();
+}
+
+/* ══ THEME (toggle dark/light comme app.html) ══ */
+function toggleTheme() {
+  const current = document.documentElement.getAttribute('data-theme') || 'dark';
+  const next = current === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', next);
+  try { localStorage.setItem('nearshop_theme', next); } catch(e) {}
 }
 
 /* ══ INIT PREFS ══ */
 (function() {
   try {
-    const t = localStorage.getItem('ns_theme');
-    const l = localStorage.getItem('ns_lang');
-    if (t && t !== 'dark') setTheme(t);
-    if (l && l !== 'fr')   setLang(l);
+    const saved_lang  = localStorage.getItem('nearshop_lang');
+    const saved_theme = localStorage.getItem('nearshop_theme');
+    if (saved_lang) {
+      const idx = LANGS.indexOf(saved_lang);
+      if (idx >= 0) { langIdx = idx; applyLang(); }
+    }
+    if (saved_theme && saved_theme !== 'dark') {
+      document.documentElement.setAttribute('data-theme', saved_theme);
+    }
   } catch(e) {}
 })();
 </script>
