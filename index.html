@@ -27,6 +27,40 @@
   --muted2:  #8090aa;
   --r:       14px;
 }
+/* LIGHT THEME */
+html[data-theme="light"] {
+  --bg:      #f5f6fa;
+  --bg2:     #ffffff;
+  --bg3:     #eef0f5;
+  --border:  #d6dae6;
+  --border2: #c5cad8;
+  --chalk:   #0d1120;
+  --muted:   #8090aa;
+  --muted2:  #6070a0;
+  --gold-d:  rgba(240,192,64,.15);
+}
+html[data-theme="light"] body { background: var(--bg); color: var(--chalk); }
+html[data-theme="light"] body::before { opacity: .007; }
+html[data-theme="light"] .ns-nav.solid { background: rgba(245,246,250,.94); border-bottom-color: var(--border); }
+html[data-theme="light"] .ns-burger span { background: var(--chalk); }
+html[data-theme="light"] .ns-drawer { background: rgba(245,246,250,.97); }
+html[data-theme="light"] .ns-logo, html[data-theme="light"] .ns-link { color: var(--chalk); }
+/* RTL Arabic */
+html[lang="ar"] { direction: rtl; }
+html[lang="ar"] .ns-links { flex-direction: row-reverse; }
+html[lang="ar"] .ns-nav-right { flex-direction: row-reverse; }
+/* SWITCHER */
+.ns-switchers { display: flex; align-items: center; gap: 5px; }
+.sw-btn {
+  display: flex; align-items: center; gap: 5px;
+  background: transparent; border: 1px solid var(--border2);
+  border-radius: 100px; padding: 5px 11px; cursor: pointer;
+  font-family: 'DM Sans', sans-serif; font-size: .76rem; font-weight: 600;
+  color: var(--muted2); transition: all .18s; white-space: nowrap;
+}
+.sw-btn:hover { border-color: var(--gold); color: var(--gold); }
+.sw-btn.active { border-color: var(--gold); color: var(--gold); background: rgba(240,192,64,.08); }
+.sw-sep { width: 1px; height: 18px; background: var(--border2); margin: 0 2px; }
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html { scroll-behavior: smooth; overflow-x: hidden; }
 body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--chalk); overflow-x: hidden; -webkit-tap-highlight-color: transparent; }
@@ -108,6 +142,7 @@ body::before { content: ''; position: fixed; inset: 0; background-image: url("da
 @media (max-width: 860px) {
   .ns-links { display: none; }
   .ns-burger { display: flex; }
+  .ns-switchers { display: none; }
 }
 @media (max-width: 500px) {
   .ns-cta { display: none; }
@@ -380,6 +415,30 @@ body::before { content: ''; position: fixed; inset: 0; background-image: url("da
 /* Sections ciblées via ancre (#comment, #concept...) toujours visibles */
 section:target .rev, section:target.rev { opacity: 1; transform: none; }
 .d1{transition-delay:.1s;} .d2{transition-delay:.2s;} .d3{transition-delay:.3s;} .d4{transition-delay:.4s;}
+
+/* ═══ SHARED NAV — NearShop Drive ═══ */
+.ns-nav{position:fixed;top:0;left:0;right:0;z-index:500;height:64px;display:flex;align-items:center;justify-content:space-between;padding:0 clamp(16px,4vw,52px);transition:background .35s,border-color .35s;}
+.ns-nav.solid{background:rgba(8,11,18,.92);border-bottom:1px solid var(--border,#1e2840);backdrop-filter:blur(20px);}
+.ns-logo{font-family:'Syne',sans-serif;font-weight:800;font-size:1.1rem;letter-spacing:-.3px;display:flex;align-items:center;gap:2px;flex-shrink:0;text-decoration:none;color:inherit;}
+.ns-logo .nsg{color:var(--accent,#f0c040);}
+.ns-links{display:flex;align-items:center;gap:2px;}
+.ns-link{padding:7px 13px;border-radius:100px;font-size:.82rem;font-weight:500;color:var(--muted2,#8090aa);transition:color .18s,background .18s;white-space:nowrap;text-decoration:none;}
+.ns-link:hover{color:var(--text,#eef0f5);background:rgba(255,255,255,.05);}
+.ns-link.ns-active{color:var(--text,#eef0f5);}
+.ns-nav-right{display:flex;align-items:center;gap:10px;}
+.ns-cta-btn{background:var(--accent,#f0c040);color:#000;font-family:'Syne',sans-serif;font-weight:700;font-size:.82rem;padding:9px 18px;border-radius:100px;transition:transform .15s,box-shadow .15s;white-space:nowrap;text-decoration:none;}
+.ns-cta-btn:hover{transform:translateY(-1px);box-shadow:0 6px 22px rgba(240,192,64,.4);}
+.ns-burger{display:none;flex-direction:column;gap:5px;background:none;border:none;cursor:pointer;padding:6px;}
+.ns-burger span{display:block;width:22px;height:2px;background:var(--text,#eef0f5);border-radius:2px;transition:all .25s;}
+.ns-burger.open span:nth-child(1){transform:translateY(7px) rotate(45deg);}
+.ns-burger.open span:nth-child(2){opacity:0;}
+.ns-burger.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg);}
+.ns-drawer{display:none;position:fixed;top:64px;left:0;right:0;z-index:490;background:rgba(8,11,18,.97);backdrop-filter:blur(20px);border-bottom:1px solid var(--border,#1e2840);flex-direction:column;padding:16px;gap:4px;transform:translateY(-8px);opacity:0;transition:opacity .25s,transform .25s;pointer-events:none;}
+.ns-drawer.open{display:flex;transform:translateY(0);opacity:1;pointer-events:all;}
+.ns-drawer .ns-link{font-size:.95rem;padding:12px 16px;border-radius:12px;}
+.ns-drawer .ns-cta-btn{text-align:center;padding:13px;border-radius:12px;margin-top:8px;display:block;}
+@media(max-width:860px){.ns-links{display:none;}.ns-burger{display:flex;}}
+@media(max-width:500px){.ns-nav .ns-cta-btn{display:none;}}
 </style>
 </head>
 <body>
@@ -388,25 +447,32 @@ section:target .rev, section:target.rev { opacity: 1; transform: none; }
 <nav class="ns-nav" id="nsNav">
   <a href="index.html" class="ns-logo"><span class="ns-logo-dot">•</span>Near<span class="ns-logo-shop">Shop</span>&nbsp;Drive</a>
   <div class="ns-links">
-    <a href="index.html" class="ns-link active">Accueil</a>
-    <a href="#comment" class="ns-link">Comment ça marche</a>
-    <a href="#concept" class="ns-link">Le concept</a>
-    <a href="#fonctionnalites" class="ns-link">Fonctionnalités</a>
-    <a href="inscription.html" class="ns-link">Inscrire mon commerce</a>
+    <a href="index.html" class="ns-link active" data-i18n="nav_home">Accueil</a>
+    <a href="#comment" class="ns-link" data-i18n="nav_how">Comment ça marche</a>
+    <a href="#concept" class="ns-link" data-i18n="nav_concept">Le concept</a>
+    <a href="#fonctionnalites" class="ns-link" data-i18n="nav_feat">Fonctionnalités</a>
+    <a href="inscription.html" class="ns-link" data-i18n="nav_register">Inscrire mon commerce</a>
   <a href="legal.html" class="ns-link">Légal</a>
   </div>
   <div class="ns-nav-right">
+    <div class="ns-switchers" id="nsSwitchers">
+      <button class="sw-btn active" id="sw-fr" onclick="setLang('fr')" title="Français">🇫🇷 FR</button>
+      <button class="sw-btn"        id="sw-ar" onclick="setLang('ar')" title="العربية">🇲🇦 AR</button>
+      <div class="sw-sep"></div>
+      <button class="sw-btn active" id="sw-dark"  onclick="setTheme('dark')"  title="Thème sombre">🌙</button>
+      <button class="sw-btn"        id="sw-light" onclick="setTheme('light')" title="Thème clair">☀️</button>
+    </div>
     <a href="app.html" class="ns-cta">🗺️ Ouvrir la carte</a>
     <button class="ns-burger" id="nsBurger" aria-label="Menu"><span></span><span></span><span></span></button>
   </div>
 </nav>
 <!-- Mobile drawer -->
 <div class="ns-drawer" id="nsDrawer">
-  <a href="index.html" class="ns-link active">Accueil</a>
-  <a href="#comment" class="ns-link">Comment ça marche</a>
-  <a href="#concept" class="ns-link">Le concept</a>
-  <a href="#fonctionnalites" class="ns-link">Fonctionnalités</a>
-  <a href="inscription.html" class="ns-link">Inscrire mon commerce</a>
+  <a href="index.html" class="ns-link active" data-i18n="nav_home">Accueil</a>
+  <a href="#comment" class="ns-link" data-i18n="nav_how">Comment ça marche</a>
+  <a href="#concept" class="ns-link" data-i18n="nav_concept">Le concept</a>
+  <a href="#fonctionnalites" class="ns-link" data-i18n="nav_feat">Fonctionnalités</a>
+  <a href="inscription.html" class="ns-link" data-i18n="nav_register">Inscrire mon commerce</a>
   <a href="legal.html" class="ns-link">Légal</a>
   <a href="app.html" class="ns-cta">🗺️ Ouvrir la carte</a>
 </div>
@@ -704,7 +770,67 @@ section:target .rev, section:target.rev { opacity: 1; transform: none; }
   <a href="app.html">🚗 Trouver un commerce Drive près de moi →</a>
 </div>
 
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js">
+
+/* ── Langue & Thème ── */
+const TRANSLATIONS = {
+  fr: {
+    nav_home: 'Accueil', nav_how: 'Comment ça marche', nav_concept: 'Le concept',
+    nav_feat: 'Fonctionnalités', nav_register: 'Inscrire mon commerce', nav_legal: 'Légal',
+    nav_cta: '🗺️ Ouvrir la carte',
+    hero_badge: '🚗  Le Drive de votre quartier',
+    hero_title: 'Votre commerce.<br>Livré à la <span class="ht-gold">voiture</span> du client.',
+    hero_sub: 'Les commerces locaux livrent directement à votre voiture. Pas d'app, pas de compte — juste WhatsApp.',
+    cta_map: '🗺️ Voir les commerces proches', cta_reg: '➕ Inscrire mon commerce',
+  },
+  ar: {
+    nav_home: 'الرئيسية', nav_how: 'كيف يعمل', nav_concept: 'المفهوم',
+    nav_feat: 'الميزات', nav_register: 'سجّل تجارتك', nav_legal: 'القانوني',
+    nav_cta: '🗺️ فتح الخريطة',
+    hero_badge: '🚗  ديلفري لسيارتك من الحي',
+    hero_title: 'تجارتك المحلية.<br>توصيل مباشرة إلى <span class="ht-gold">سيارتك</span>.',
+    hero_sub: 'المحلات المحلية توصّل مباشرة لسيارتك. بدون تطبيق، بدون حساب — فقط واتساب.',
+    cta_map: '🗺️ اعثر على المحلات القريبة', cta_reg: '➕ سجّل تجارتك',
+  }
+};
+
+function setLang(lang) {
+  const html = document.documentElement;
+  html.lang = lang;
+  // Save preference
+  try { localStorage.setItem('ns_lang', lang); } catch(e) {}
+  // Update switcher buttons
+  document.getElementById('sw-fr').classList.toggle('active', lang === 'fr');
+  document.getElementById('sw-ar').classList.toggle('active', lang === 'ar');
+  // Translate elements with data-i18n
+  const t = TRANSLATIONS[lang] || TRANSLATIONS.fr;
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.dataset.i18n;
+    if (t[key] !== undefined) {
+      if (el.dataset.i18nHtml) el.innerHTML = t[key];
+      else el.textContent = t[key];
+    }
+  });
+}
+
+function setTheme(theme) {
+  document.documentElement.setAttribute('data-theme', theme);
+  try { localStorage.setItem('ns_theme', theme); } catch(e) {}
+  document.getElementById('sw-dark').classList.toggle('active', theme === 'dark');
+  document.getElementById('sw-light').classList.toggle('active', theme === 'light');
+}
+
+// Init from saved prefs
+(function() {
+  try {
+    const savedTheme = localStorage.getItem('ns_theme');
+    const savedLang  = localStorage.getItem('ns_lang');
+    if (savedTheme && savedTheme !== 'dark') setTheme(savedTheme);
+    if (savedLang  && savedLang  !== 'fr')   setLang(savedLang);
+  } catch(e) {}
+})();
+
+</script><script>
 /* ── Nav scroll ── */
 const nsNav = document.getElementById('nsNav');
 window.addEventListener('scroll', () => nsNav.classList.toggle('solid', window.scrollY > 30), { passive: true });
