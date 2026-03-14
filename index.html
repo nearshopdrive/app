@@ -491,12 +491,12 @@ section:target .rev, section:target.rev { opacity: 1; transform: none; }
 <div class="hero-road-bg"></div>
 <section class="hero">
   <div>
-    <div class="hero-badge"><span class="pulse"></span>Nouveau concept · Drive local</div>
-    <h1 class="hero-title">Restez dans<br>votre <em>voiture</em>. 🚗<br>On vous livre.</h1>
-    <p class="hero-desc">NearShop Drive répertorie les commerces locaux qui <strong>livrent directement à votre véhicule</strong>. Localisez, sélectionnez, commandez via WhatsApp — et restez <strong>confortablement installé</strong>.</p>
+    <div class="hero-badge" data-i18n="hero_badge"><span class="pulse"></span>Nouveau concept · Drive local</div>
+    <h1 class="hero-title" data-i18n="hero_title">Restez dans<br>votre <em>voiture</em>. 🚗<br>On vous livre.</h1>
+    <p class="hero-desc" data-i18n="hero_desc">NearShop Drive répertorie les commerces locaux qui <strong>livrent directement à votre véhicule</strong>. Localisez, sélectionnez, commandez via WhatsApp — et restez <strong>confortablement installé</strong>.</p>
     <div class="hero-btns">
-      <a href="app.html" class="btn-gold">🗺️ Trouver un commerce Drive</a>
-      <a href="#comment" class="btn-ghost">Comment ça marche ?</a>
+      <a href="app.html" class="btn-gold" data-i18n="cta_map">🗺️ Trouver un commerce Drive</a>
+      <a href="#comment" class="btn-ghost" data-i18n="cta_how">Comment ça marche ?</a>
     </div>
     <div class="hero-trust">
       <span class="trust-item">Sans sortir de voiture</span>
@@ -558,27 +558,27 @@ section:target .rev, section:target.rev { opacity: 1; transform: none; }
 <section class="section rev" id="comment">
   <div class="container">
     <div class="sec-label">Comment ça marche</div>
-    <h2 class="sec-title">4 étapes, <span class="gold">zéro effort.</span></h2>
-    <p class="sec-sub">Du parking au produit dans votre main — sans quitter votre siège.</p>
+    <h2 class="sec-title" data-i18n="how_title">4 étapes, <span class="gold">zéro effort.</span></h2>
+    <p class="sec-sub" data-i18n="how_sub">Du parking au produit dans votre main — sans quitter votre siège.</p>
     <div class="steps-grid rev d1">
       <div class="step-card">
         <div class="step-n">ÉTAPE 01</div>
         <span class="step-emoji">📍</span>
-        <div class="step-title">Localisez-vous</div>
+        <div class="step-title" data-i18n="s1_title">Localisez-vous</div>
         <p class="step-desc">Activez votre GPS ou cherchez une ville. La carte affiche tous les <strong>commerces Drive</strong> dans votre rayon.</p>
         <div class="step-accent"></div>
       </div>
       <div class="step-card">
         <div class="step-n">ÉTAPE 02</div>
         <span class="step-emoji">🏪</span>
-        <div class="step-title">Choisissez un commerce</div>
+        <div class="step-title" data-i18n="s2_title">Choisissez un commerce</div>
         <p class="step-desc">Consultez la fiche : horaires, photos, avis clients, distance. Ajoutez vos <strong>favoris</strong> pour les retrouver.</p>
         <div class="step-accent"></div>
       </div>
       <div class="step-card">
         <div class="step-n">ÉTAPE 03</div>
         <span class="step-emoji">💬</span>
-        <div class="step-title">Commandez via WhatsApp</div>
+        <div class="step-title" data-i18n="s3_title">Commandez via WhatsApp</div>
         <p class="step-desc">Un tap ouvre <strong>WhatsApp</strong> directement avec le commerçant. Donnez votre commande et attendez la confirmation.</p>
         <div class="step-accent"></div>
       </div>
@@ -777,7 +777,7 @@ section:target .rev, section:target.rev { opacity: 1; transform: none; }
 
 <!-- STICKY MOBILE CTA -->
 <div class="sticky-cta">
-  <a href="app.html">🚗 Trouver un commerce Drive près de moi →</a>
+  <a href="app.html" data-i18n="sticky_cta">🚗 Trouver un commerce Drive près de moi →</a>
 </div>
 
 <script>
@@ -833,28 +833,62 @@ const LANG_RTL    = { ar: true };
 let langIdx = 0;
 
 const T_INDEX = {
-  fr: { nav_home:'Accueil', nav_how:'Comment ça marche', nav_concept:'Le concept',
-        nav_feat:'Fonctionnalités', nav_register:'Inscrire mon commerce' },
-  en: { nav_home:'Home', nav_how:'How it works', nav_concept:'The concept',
-        nav_feat:'Features', nav_register:'Register my store' },
-  ar: { nav_home:'الرئيسية', nav_how:'كيف يعمل', nav_concept:'المفهوم',
-        nav_feat:'الميزات', nav_register:'سجّل تجارتك' }
+  fr:{
+    nav_home:'Accueil', nav_how:'Comment ça marche', nav_concept:'Le concept',
+    nav_feat:'Fonctionnalités', nav_register:'Inscrire mon commerce',
+    hero_badge:'Nouveau concept · Drive local',
+    hero_title:'Restez dans<br>votre <em>voiture</em>. 🚗<br>On vous livre.',
+    hero_desc:'NearShop Drive répertorie les commerces locaux qui livrent directement à votre véhicule. Localisez, commandez via WhatsApp — et restez confortablement installé.',
+    how_title:'4 étapes, zéro effort.',
+    how_sub:'Du parking au produit dans votre main — sans quitter votre siège.',
+    s1_title:'Localisez-vous', s2_title:'Choisissez un commerce',
+    s3_title:'Commandez via WhatsApp', s4_title:'Livraison à votre voiture',
+    cta_map:'🗺️ Trouver un commerce Drive', cta_how:'Comment ça marche ?',
+    sticky_cta:'🚗 Trouver un commerce Drive près de moi →',
+  },
+  en:{
+    nav_home:'Home', nav_how:'How it works', nav_concept:'The concept',
+    nav_feat:'Features', nav_register:'Register my store',
+    hero_badge:'New concept · Local Drive',
+    hero_title:'Stay in<br>your <em>car</em>. 🚗<br>We deliver.',
+    hero_desc:'NearShop Drive lists local stores that deliver directly to your vehicle. Find, order via WhatsApp — and stay comfortably seated.',
+    how_title:'4 steps, zero effort.',
+    how_sub:'From the parking lot to your hand — without leaving your seat.',
+    s1_title:'Locate yourself', s2_title:'Choose a store',
+    s3_title:'Order via WhatsApp', s4_title:'Delivery to your car',
+    cta_map:'🗺️ Find a Drive store', cta_how:'How does it work?',
+    sticky_cta:'🚗 Find a Drive store near me →',
+  },
+  ar:{
+    nav_home:'الرئيسية', nav_how:'كيف يعمل', nav_concept:'المفهوم',
+    nav_feat:'الميزات', nav_register:'سجّل تجارتك',
+    hero_badge:'مفهوم جديد · درايف محلي',
+    hero_title:'ابقَ في<br>سيارتك <em>🚗</em><br>نحن نوصّل.',
+    hero_desc:'NearShop Drive يُدرج المحلات المحلية التي توصّل مباشرة لسيارتك. ابحث، اطلب عبر واتساب — وابقَ مرتاحاً في مقعدك.',
+    how_title:'٤ خطوات، بدون جهد.',
+    how_sub:'من موقف السيارات إلى يدك — دون مغادرة مقعدك.',
+    s1_title:'حدد موقعك', s2_title:'اختر محلاً',
+    s3_title:'اطلب عبر واتساب', s4_title:'التوصيل لسيارتك',
+    cta_map:'🗺️ إيجاد محل درايف', cta_how:'كيف يعمل؟',
+    sticky_cta:'🚗 إيجاد محل درايف قريب →',
+  }
 };
 
 function applyLang() {
   const l = LANGS[langIdx];
-  // Mettre à jour le label sur tous les boutons langue
   document.querySelectorAll('#langLabel,#langLabelM').forEach(el => {
     el.textContent = LANG_LABELS[l] || l.toUpperCase();
   });
-  // RTL
   document.documentElement.setAttribute('dir', LANG_RTL[l] ? 'rtl' : 'ltr');
   document.documentElement.lang = l;
-  // Traduire les éléments data-i18n
   const t = T_INDEX[l] || T_INDEX.fr;
   document.querySelectorAll('[data-i18n]').forEach(el => {
     const k = el.getAttribute('data-i18n');
-    if (t[k]) el.textContent = t[k];
+    if (t[k] !== undefined) {
+      // innerHTML pour les éléments avec balises HTML internes
+      if (['hero_title','hero_desc'].includes(k)) el.innerHTML = t[k];
+      else el.textContent = t[k];
+    }
   });
   try { localStorage.setItem('nearshop_lang', l); } catch(e) {}
 }
