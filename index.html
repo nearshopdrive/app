@@ -50,17 +50,19 @@ html[lang="ar"] { direction: rtl; }
 html[lang="ar"] .ns-links { flex-direction: row-reverse; }
 html[lang="ar"] .ns-nav-right { flex-direction: row-reverse; }
 /* SWITCHER */
-.ns-switchers { display: flex; align-items: center; gap: 5px; }
+.ns-switchers { display: flex; align-items: center; gap: 4px; }
 .sw-btn {
-  display: flex; align-items: center; gap: 5px;
+  display: flex; align-items: center; gap: 4px;
   background: transparent; border: 1px solid var(--border2);
-  border-radius: 100px; padding: 5px 11px; cursor: pointer;
-  font-family: 'DM Sans', sans-serif; font-size: .76rem; font-weight: 600;
+  border-radius: 100px; padding: 4px 9px; cursor: pointer;
+  font-family: 'DM Sans', sans-serif; font-size: .72rem; font-weight: 600;
   color: var(--muted2); transition: all .18s; white-space: nowrap;
 }
 .sw-btn:hover { border-color: var(--gold); color: var(--gold); }
 .sw-btn.active { border-color: var(--gold); color: var(--gold); background: rgba(240,192,64,.08); }
-.sw-sep { width: 1px; height: 18px; background: var(--border2); margin: 0 2px; }
+.sw-sep { width: 1px; height: 16px; background: var(--border2); margin: 0 2px; }
+.drawer-switchers { display: flex; gap: 8px; padding: 10px 16px 4px; flex-wrap: wrap; }
+.drawer-switchers .sw-btn { font-size: .82rem; padding: 7px 14px; }
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html { scroll-behavior: smooth; overflow-x: hidden; }
 body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--chalk); overflow-x: hidden; -webkit-tap-highlight-color: transparent; }
@@ -142,7 +144,7 @@ body::before { content: ''; position: fixed; inset: 0; background-image: url("da
 @media (max-width: 860px) {
   .ns-links { display: none; }
   .ns-burger { display: flex; }
-  .ns-switchers { display: none; }
+  .ns-switchers { display: none; }  /* Hidden from main nav on mobile — shown in drawer */
 }
 @media (max-width: 500px) {
   .ns-cta { display: none; }
@@ -159,7 +161,8 @@ body::before { content: ''; position: fixed; inset: 0; background-image: url("da
   max-width: 1200px; margin: 0 auto;
   position: relative;
 }
-@media (max-width: 860px) { .hero { grid-template-columns: 1fr; text-align: center; padding-top: 100px; gap: 32px; } .hero-visual { display: none; } }
+@media (max-width: 860px) { .hero { grid-template-columns: 1fr; text-align: center; padding-top: 90px; gap: 24px; } .hero-visual { display: none; } }
+@media (max-width: 640px) { .hero { padding-top: 84px; min-height: auto; padding-bottom: 100px; } }
 
 .hero::before { content: ''; position: absolute; left: -10%; top: 5%; width: 600px; height: 600px; background: radial-gradient(ellipse, rgba(240,192,64,.07), transparent 65%); pointer-events: none; }
 
@@ -182,11 +185,12 @@ body::before { content: ''; position: fixed; inset: 0; background-image: url("da
 
 .hero-title {
   font-family: 'Syne', sans-serif;
-  font-size: clamp(2.6rem, 5.5vw, 4.4rem);
-  font-weight: 800; letter-spacing: -2px; line-height: 1.06;
+  font-size: clamp(2rem, 5.5vw, 4.4rem);
+  font-weight: 800; letter-spacing: -2px; line-height: 1.08;
   margin-bottom: 22px;
   opacity: 0; animation: up .5s .22s forwards;
 }
+@media (max-width: 480px) { .hero-title { letter-spacing: -1px; } }
 .hero-title em { font-style: normal; color: var(--gold); }
 
 .hero-desc {
@@ -412,8 +416,8 @@ body::before { content: ''; position: fixed; inset: 0; background-image: url("da
 ═══════════════════════════════════════ */
 .rev { opacity: 0; transform: translateY(28px); transition: opacity .7s ease, transform .7s ease; }
 .rev.in { opacity: 1; transform: translateY(0); }
-/* Sections ciblées via ancre (#comment, #concept...) toujours visibles */
 section:target .rev, section:target.rev { opacity: 1; transform: none; }
+@media (max-width: 640px) { .rev { transform: translateY(16px); } }
 .d1{transition-delay:.1s;} .d2{transition-delay:.2s;} .d3{transition-delay:.3s;} .d4{transition-delay:.4s;}
 
 /* ═══ SHARED NAV — NearShop Drive ═══ */
@@ -455,12 +459,12 @@ section:target .rev, section:target.rev { opacity: 1; transform: none; }
   <a href="legal.html" class="ns-link">Légal</a>
   </div>
   <div class="ns-nav-right">
-    <div class="ns-switchers" id="nsSwitchers">
-      <button class="sw-btn active" id="sw-fr" onclick="setLang('fr')" title="Français">🇫🇷 FR</button>
-      <button class="sw-btn"        id="sw-ar" onclick="setLang('ar')" title="العربية">🇲🇦 AR</button>
+    <div class="ns-switchers">
+      <button class="sw-btn sw-lang-fr active" onclick="setLang('fr')">🇫🇷 FR</button>
+      <button class="sw-btn sw-lang-ar"        onclick="setLang('ar')">🇲🇦 AR</button>
       <div class="sw-sep"></div>
-      <button class="sw-btn active" id="sw-dark"  onclick="setTheme('dark')"  title="Thème sombre">🌙</button>
-      <button class="sw-btn"        id="sw-light" onclick="setTheme('light')" title="Thème clair">☀️</button>
+      <button class="sw-btn sw-th-dark  active" onclick="setTheme('dark')">🌙</button>
+      <button class="sw-btn sw-th-light"        onclick="setTheme('light')">☀️</button>
     </div>
     <a href="app.html" class="ns-cta">🗺️ Ouvrir la carte</a>
     <button class="ns-burger" id="nsBurger" aria-label="Menu"><span></span><span></span><span></span></button>
@@ -475,6 +479,12 @@ section:target .rev, section:target.rev { opacity: 1; transform: none; }
   <a href="inscription.html" class="ns-link" data-i18n="nav_register">Inscrire mon commerce</a>
   <a href="legal.html" class="ns-link">Légal</a>
   <a href="app.html" class="ns-cta">🗺️ Ouvrir la carte</a>
+  <div class="drawer-switchers">
+    <button class="sw-btn sw-lang-fr active" onclick="setLang('fr')">🇫🇷 Français</button>
+    <button class="sw-btn sw-lang-ar"        onclick="setLang('ar')">🇲🇦 العربية</button>
+    <button class="sw-btn sw-th-dark  active" onclick="setTheme('dark')">🌙 Sombre</button>
+    <button class="sw-btn sw-th-light"        onclick="setTheme('light')">☀️ Clair</button>
+  </div>
 </div>
 
 <!-- ════════ HERO ════════ -->
@@ -770,8 +780,8 @@ section:target .rev, section:target.rev { opacity: 1; transform: none; }
   <a href="app.html">🚗 Trouver un commerce Drive près de moi →</a>
 </div>
 
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js">
-
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script>
+<script>
 /* ── Langue & Thème ── */
 const TRANSLATIONS = {
   fr: {
@@ -795,19 +805,16 @@ const TRANSLATIONS = {
 };
 
 function setLang(lang) {
-  const html = document.documentElement;
-  html.lang = lang;
-  // Save preference
+  document.documentElement.lang = lang;
   try { localStorage.setItem('ns_lang', lang); } catch(e) {}
-  // Update switcher buttons
-  document.getElementById('sw-fr').classList.toggle('active', lang === 'fr');
-  document.getElementById('sw-ar').classList.toggle('active', lang === 'ar');
+  document.querySelectorAll('.sw-lang-fr').forEach(b => b.classList.toggle('active', lang==='fr'));
+  document.querySelectorAll('.sw-lang-ar').forEach(b => b.classList.toggle('active', lang==='ar'));
   // Translate elements with data-i18n
   const t = TRANSLATIONS[lang] || TRANSLATIONS.fr;
   document.querySelectorAll('[data-i18n]').forEach(el => {
     const key = el.dataset.i18n;
     if (t[key] !== undefined) {
-      if (el.dataset.i18nHtml) el.innerHTML = t[key];
+      if (el.dataset.i18nHtml !== undefined) el.innerHTML = t[key];
       else el.textContent = t[key];
     }
   });
@@ -816,8 +823,8 @@ function setLang(lang) {
 function setTheme(theme) {
   document.documentElement.setAttribute('data-theme', theme);
   try { localStorage.setItem('ns_theme', theme); } catch(e) {}
-  document.getElementById('sw-dark').classList.toggle('active', theme === 'dark');
-  document.getElementById('sw-light').classList.toggle('active', theme === 'light');
+  document.querySelectorAll('.sw-th-dark').forEach(b  => b.classList.toggle('active', theme==='dark'));
+  document.querySelectorAll('.sw-th-light').forEach(b => b.classList.toggle('active', theme==='light'));
 }
 
 // Init from saved prefs
