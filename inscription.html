@@ -100,8 +100,8 @@ a{text-decoration:none;color:inherit;}
 .sugg-item:hover{background:rgba(240,192,64,.07);}
 .sugg-main{font-weight:500;color:var(--chalk);font-size:.84rem;}
 .sugg-sub{font-size:.72rem;color:var(--muted2);margin-top:2px;}
-.map-wrap{border-radius:14px;overflow:hidden;border:1px solid var(--bdr);margin-bottom:8px;height:290px;}
-#pickerMap{height:100%;width:100%;min-height:290px;}
+.map-wrap{border-radius:14px;overflow:hidden;border:1px solid var(--bdr);margin-bottom:8px;height:290px;position:relative;}
+#pickerMap{height:290px;width:100%;min-height:290px;}
 .coords-hint{font-size:.74rem;color:var(--muted2);text-align:center;padding:8px 0 4px;}
 .loc-detected{display:none;margin-top:12px;background:rgba(61,255,160,.06);border:1px solid rgba(61,255,160,.2);border-radius:12px;padding:12px 16px;font-size:.84rem;}
 .loc-detected-label{color:var(--jade);font-weight:700;font-size:.7rem;letter-spacing:.5px;margin-bottom:4px;}
@@ -199,7 +199,6 @@ a{text-decoration:none;color:inherit;}
 
 
 /* ── SWITCHERS LANG/THEME (all pages) ── */
-.ns-switchers{display:flex;align-items:center;gap:4px;}
 .sw-btn{display:flex;align-items:center;gap:4px;background:transparent;border:1px solid var(--bdr,#1e2840);border-radius:100px;padding:4px 10px;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:.72rem;font-weight:600;color:var(--muted2,#8090aa);transition:all .18s;white-space:nowrap;}
 .sw-btn:hover{border-color:var(--gold,#f0c040);color:var(--gold,#f0c040);}
 .sw-btn.active{border-color:var(--gold,#f0c040);color:var(--gold,#f0c040);background:rgba(240,192,64,.08);}
@@ -210,6 +209,11 @@ html[data-theme="light"]{--bg:#f5f6fa!important;--bg2:#ffffff!important;--bg3:#e
 html[data-theme="light"] body{background:#f5f6fa;color:#0d1120;}
 html[lang="ar"]{direction:rtl;}
 
+.lang-btn{padding:0 12px;height:36px;border-radius:10px;border:1px solid var(--bdr,#1e2840);background:var(--bg2,#10131b);color:var(--chalk,#eef0f5);font-family:'Syne',sans-serif;font-weight:700;font-size:.78rem;cursor:pointer;transition:all .2s;display:inline-flex;align-items:center;gap:5px;white-space:nowrap;}
+.lang-btn:hover{border-color:var(--gold,#f0c040);color:var(--gold,#f0c040);}
+.icon-btn{width:36px;height:36px;border-radius:10px;border:1px solid var(--bdr,#1e2840);background:var(--bg2,#10131b);color:var(--chalk,#eef0f5);font-size:1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;}
+.icon-btn:hover{border-color:var(--gold,#f0c040);color:var(--gold,#f0c040);}
+@media(max-width:860px){.lang-btn,.icon-btn{height:32px;font-size:.72rem;}}
 </style>
 </head>
 <body>
@@ -226,6 +230,8 @@ html[lang="ar"]{direction:rtl;}
     <a href="legal.html" class="ns-link">Legal</a>
   </div>
   <div class="ns-nav-right">
+    <button class="lang-btn" onclick="cycleLang()">🌍 <span id="langLabel">FR</span></button>
+    <button class="icon-btn" onclick="toggleTheme()" title="Thème">🌗</button>
     <a href="app.html" class="ns-cta-btn">&#128506; Ouvrir la carte</a>
     <button class="ns-burger" id="nsBurger" aria-label="Menu"><span></span><span></span><span></span></button>
   </div>
@@ -238,6 +244,10 @@ html[lang="ar"]{direction:rtl;}
   <a href="inscription.html" class="ns-link ns-active">Inscrire mon commerce</a>
   <a href="legal.html" class="ns-link">Legal</a>
   <a href="app.html" class="ns-cta-btn">&#128506; Ouvrir la carte</a>
+  <div style="display:flex;gap:8px;padding:10px 16px 4px;border-top:1px solid var(--bdr);margin-top:8px;">
+    <button class="lang-btn" onclick="cycleLang()" style="flex:1;display:flex;align-items:center;justify-content:center;gap:6px;">🌍 <span id="langLabelM">FR</span></button>
+    <button class="icon-btn" onclick="toggleTheme()">🌗</button>
+  </div>
 </div>
 
 <!-- HERO -->
@@ -466,14 +476,18 @@ function goldIcon(){return L.divIcon({html:'<div style="width:30px;height:30px;b
 function initMap(){
   const el = document.getElementById('pickerMap');
   if (!el) return;
-  if(map){
-    setTimeout(() => map.invalidateSize(), 50);
-    return;
-  }
-  map=L.map('pickerMap',{zoomControl:true}).setView([30.4202,-9.5982],14);
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'&#169; <a href="https://openstreetmap.org">OpenStreetMap</a>',maxZoom:19}).addTo(map);
-  map.on('click',e=>placeMarker(e.latlng.lat,e.latlng.lng,true));
-  setTimeout(() => map.invalidateSize(), 100);
+  if (map) { map.invalidateSize(); return; }
+  // Initialiser Leaflet (même si container display:none — on invalide après)
+  map = L.map('pickerMap', { zoomControl: true, preferCanvas: true }).setView([30.4202, -9.5982], 14);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; <a href="https://openstreetmap.org">OpenStreetMap</a>',
+    maxZoom: 19,
+    crossOrigin: true
+  }).addTo(map);
+  map.on('click', e => placeMarker(e.latlng.lat, e.latlng.lng, true));
+  // Forcer le recalcul des tuiles après affichage
+  setTimeout(() => map.invalidateSize(true), 300);
+  setTimeout(() => map.invalidateSize(true), 800);
 }
 function placeMarker(lat,lng,doReverse){
   if(marker)map.removeLayer(marker);
@@ -593,7 +607,15 @@ function setStep(n){
   });
   window.scrollTo({top:0,behavior:'smooth'});
 }
-function goStep(n){setStep(n);if(n===1)setTimeout(()=>{if(map){map.invalidateSize();}else{tryInitMap();}},300);}
+function goStep(n){
+  setStep(n);
+  if(n===1){
+    setTimeout(()=>{
+      if(map){ map.invalidateSize(true); }
+      else    { initMap(); }
+    }, 350);
+  }
+}
 function goStep2(){
   let ok=true;
   const name=document.getElementById('f-name').value.trim();
@@ -649,38 +671,40 @@ async function submitForm(){
   }
 }
 function showSuc(){document.getElementById('progBar').style.display='none';document.getElementById('step3').style.display='none';document.getElementById('sucScreen').classList.add('show');}
-// Init carte : attendre que le conteneur soit peint avec des dimensions réelles
-function tryInitMap() {
-  const el = document.getElementById('pickerMap');
-  if (!el) return;
-  // Force display check via offsetWidth (triggers reflow)
-  const w = el.offsetWidth;
-  if (w > 0) {
-    initMap();
-  } else {
-    // Container not visible yet, retry
-    setTimeout(tryInitMap, 150);
-  }
-}
+// Init carte: on initialise immédiatement, puis invalidateSize après affichage
 window.addEventListener('load', () => {
-  // Small delay to ensure CSS is fully applied
-  requestAnimationFrame(() => setTimeout(tryInitMap, 100));
+  // Initialiser la carte même si le container n'est pas visible
+  // Leaflet peut init sur un container display:none, mais on doit invalider après
+  initMap();
+  // Invalider après que l'animation CSS soit terminée
+  setTimeout(() => { if (map) map.invalidateSize(); }, 400);
 });
 
 /* ── Switchers Langue & Thème ── */
-function setLang(lang){
-  document.documentElement.lang=lang;
-  try{localStorage.setItem('ns_lang',lang);}catch(e){}
-  document.querySelectorAll('.sw-lang-fr').forEach(b=>b.classList.toggle('active',lang==='fr'));
-  document.querySelectorAll('.sw-lang-ar').forEach(b=>b.classList.toggle('active',lang==='ar'));
+const LANGS=['fr','en','ar'];
+const LANG_LABELS={fr:'FR',en:'EN',ar:'عر'};
+let langIdx=0;
+function applyLang(){
+  const l=LANGS[langIdx];
+  document.querySelectorAll('#langLabel,#langLabelM').forEach(el=>el.textContent=LANG_LABELS[l]||l.toUpperCase());
+  document.documentElement.setAttribute('dir',l==='ar'?'rtl':'ltr');
+  document.documentElement.lang=l;
+  try{localStorage.setItem('nearshop_lang',l);}catch(e){}
 }
-function setTheme(theme){
-  document.documentElement.setAttribute('data-theme',theme);
-  try{localStorage.setItem('ns_theme',theme);}catch(e){}
-  document.querySelectorAll('.sw-th-dark').forEach(b=>b.classList.toggle('active',theme==='dark'));
-  document.querySelectorAll('.sw-th-light').forEach(b=>b.classList.toggle('active',theme==='light'));
+function cycleLang(){langIdx=(langIdx+1)%LANGS.length;applyLang();}
+function toggleTheme(){
+  const t=document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark';
+  document.documentElement.setAttribute('data-theme',t);
+  try{localStorage.setItem('nearshop_theme',t);}catch(e){}
 }
-(function(){try{const t=localStorage.getItem('ns_theme'),l=localStorage.getItem('ns_lang');if(t&&t!=='dark')setTheme(t);if(l&&l!=='fr')setLang(l);}catch(e){}})();
+(function(){
+  try{
+    const l=localStorage.getItem('nearshop_lang');
+    const t=localStorage.getItem('nearshop_theme');
+    if(l){const i=LANGS.indexOf(l);if(i>=0){langIdx=i;applyLang();}}
+    if(t&&t!=='dark'){document.documentElement.setAttribute('data-theme',t);}
+  }catch(e){}
+})();
 
 </script>
 </body>
