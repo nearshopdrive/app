@@ -77,8 +77,10 @@ a{text-decoration:none;color:inherit;}
 .pl{font-size:.68rem;font-weight:600;color:var(--muted);text-align:center;white-space:nowrap;}
 .ps.active .pl{color:var(--gold);}
 .ps.done .pl{color:var(--jade);}
-.fc{background:var(--bg2);border:1px solid var(--bdr);border-radius:20px;padding:clamp(20px,4vw,34px);margin-bottom:20px;display:none;}
-.fc.active{display:block;animation:fadeIn .3s ease;}
+.fc{background:var(--bg2);border:1px solid var(--bdr);border-radius:20px;padding:clamp(20px,4vw,34px);margin-bottom:20px;
+  /* Cacher sans display:none pour que Leaflet puisse calculer les dimensions */
+  position:absolute;left:-9999px;top:-9999px;visibility:hidden;pointer-events:none;width:700px;overflow:hidden;}
+.fc.active{position:relative;left:auto;top:auto;visibility:visible;pointer-events:all;width:auto;overflow:visible;display:block;animation:fadeIn .3s ease;}
 @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
 .cs-label{font-size:.7rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--gold);margin-bottom:8px;display:flex;align-items:center;gap:8px;}
 .cs-label::before{content:'';width:20px;height:2px;background:var(--gold);}
@@ -100,8 +102,8 @@ a{text-decoration:none;color:inherit;}
 .sugg-item:hover{background:rgba(240,192,64,.07);}
 .sugg-main{font-weight:500;color:var(--chalk);font-size:.84rem;}
 .sugg-sub{font-size:.72rem;color:var(--muted2);margin-top:2px;}
-.map-wrap{border-radius:14px;overflow:hidden;border:1px solid var(--bdr);margin-bottom:8px;height:290px;position:relative;}
-#pickerMap{height:290px;width:100%;min-height:290px;}
+.map-wrap{border-radius:14px;overflow:hidden;border:1px solid var(--bdr);margin-bottom:8px;height:280px;position:relative;}
+#pickerMap{height:280px !important;width:100% !important;min-height:280px;}
 .coords-hint{font-size:.74rem;color:var(--muted2);text-align:center;padding:8px 0 4px;}
 .loc-detected{display:none;margin-top:12px;background:rgba(61,255,160,.06);border:1px solid rgba(61,255,160,.2);border-radius:12px;padding:12px 16px;font-size:.84rem;}
 .loc-detected-label{color:var(--jade);font-weight:700;font-size:.7rem;letter-spacing:.5px;margin-bottom:4px;}
@@ -222,11 +224,11 @@ html[lang="ar"]{direction:rtl;}
 <nav class="ns-nav" id="nsNav">
   <a href="index.html" class="ns-logo"><span class="nsg">&#8226;</span>Near<span class="nsg">Shop</span>&nbsp;Drive</a>
   <div class="ns-links">
-    <a href="index.html" class="ns-link">Accueil</a>
+    <a href="index.html" class="ns-link" data-i18n="nav_home">Accueil</a>
     <a href="index.html#comment" class="ns-link">Comment ca marche</a>
     <a href="index.html#concept" class="ns-link">Le concept</a>
     <a href="index.html#fonctionnalites" class="ns-link">Fonctionnalites</a>
-    <a href="inscription.html" class="ns-link ns-active">Inscrire mon commerce</a>
+    <a href="inscription.html" class="ns-link ns-active" data-i18n="nav_register">Inscrire mon commerce</a>
     <a href="legal.html" class="ns-link">Legal</a>
   </div>
   <div class="ns-nav-right">
@@ -253,13 +255,13 @@ html[lang="ar"]{direction:rtl;}
 <!-- HERO -->
 <div class="hero">
   <div class="hero-grid"></div>
-  <div class="hero-badge"><span class="pulse-g"></span>Rejoignez NearShop Drive</div>
+  <div class="hero-badge"><span class="pulse-g"></span data-i18n="hero_badge">Rejoignez NearShop Drive</div>
   <h1 class="hero-title">Inscrivez votre commerce.<br>Livrez &#224; la <span class="gold">voiture</span> de vos clients.</h1>
   <p class="hero-desc">En 3 minutes, votre fiche est soumise. Sous <strong>24&#8211;48h</strong> elle est v&#233;rifi&#233;e et publi&#233;e.<br><strong>100% gratuit &middot; Z&#233;ro commission &middot; Aucune application requise.</strong></p>
   <div class="hero-steps">
     <div class="h-step"><span class="h-step-num">1</span>Localisation &amp; infos</div>
     <div class="h-arr">&#8594;</div>
-    <div class="h-step"><span class="h-step-num">2</span>Horaires &amp; photos</div>
+    <div class="h-step"><span class="h-step-num">2</span data-i18n="step2_title">Horaires &amp; photos</div>
     <div class="h-arr">&#8594;</div>
     <div class="h-step"><span class="h-step-num">3</span>V&#233;rification &amp; envoi</div>
   </div>
@@ -299,8 +301,8 @@ html[lang="ar"]{direction:rtl;}
 
   <!-- ETAPE 1 -->
   <div class="fc active" id="step1">
-    <div class="cs-label">Etape 1 sur 3</div>
-    <div class="ct">Localisez votre commerce sur la carte</div>
+    <div class="cs-label" data-i18n="step1_label">Etape 1 sur 3</div>
+    <div class="ct" data-i18n="step1_title">Localisez votre commerce sur la carte</div>
     <div class="cd">Cherchez votre adresse, cliquez sur la carte ou utilisez le GPS. Le nom et l&#8217;adresse se remplissent automatiquement.</div>
     <div class="map-search-bar">
       <input type="text" class="map-si" id="searchInput" placeholder="&#128269;  Cherchez le nom ou l&#8217;adresse de votre commerce&hellip;" autocomplete="off" oninput="onSI()" onkeydown="if(event.key==='Enter'){event.preventDefault();doSearch();}">
@@ -318,18 +320,18 @@ html[lang="ar"]{direction:rtl;}
     <input type="hidden" id="f-lng">
     <div style="margin-top:22px;">
       <div class="fg">
-        <label>Nom du commerce <span class="req">*</span></label>
+        <label data-i18n="lbl_name">Nom du commerce <span class="req">*</span></label>
         <input type="text" id="f-name" placeholder="Ex: Epicerie Al Baraka, Boulangerie Samir&hellip;">
         <div class="fg-err" id="err-name">Le nom est obligatoire.</div>
       </div>
       <div class="fg">
-        <label>Adresse compl&#232;te <span class="req">*</span></label>
+        <label data-i18n="lbl_addr">Adresse compl&#232;te <span class="req">*</span></label>
         <input type="text" id="f-address" placeholder="Rue, Num&#233;ro, Ville, Pays">
         <div class="fg-hint">Rempli automatiquement depuis la carte &#8212; vous pouvez modifier.</div>
         <div class="fg-err" id="err-addr">L&#8217;adresse est obligatoire.</div>
       </div>
       <div class="fg">
-        <label>Cat&#233;gorie <span class="req">*</span></label>
+        <label data-i18n="lbl_cat">Cat&#233;gorie <span class="req">*</span></label>
         <div class="cat-grid">
           <div class="cat-pill" data-cat="&#128722; Epicerie"><span class="cp-e">&#128722;</span><span class="cp-l">Epicerie</span></div>
           <div class="cat-pill" data-cat="&#129390; Boulangerie"><span class="cp-e">&#129390;</span><span class="cp-l">Boulangerie</span></div>
@@ -349,7 +351,7 @@ html[lang="ar"]{direction:rtl;}
       </div>
       <div class="fg-row">
         <div class="fg">
-          <label>T&#233;l&#233;phone <span class="req">*</span></label>
+          <label data-i18n="lbl_phone">T&#233;l&#233;phone <span class="req">*</span></label>
           <input type="tel" id="f-phone" placeholder="+212 6 00 00 00 00">
           <div class="fg-err" id="err-phone">Num&#233;ro obligatoire.</div>
         </div>
@@ -375,12 +377,12 @@ html[lang="ar"]{direction:rtl;}
         <div class="fg-hint"><span id="desc-cnt">0</span>/300 caract&#232;res</div>
       </div>
     </div>
-    <div class="fn"><button class="btn-n" onclick="goStep2()">Continuer &#8594; Horaires &amp; photos</button></div>
+    <div class="fn"><button class="btn-n" onclick="goStep2()" data-i18n="btn_continue">Continuer &#8594; Horaires &amp; photos</button></div>
   </div>
 
   <!-- ETAPE 2 -->
   <div class="fc" id="step2">
-    <div class="cs-label">Etape 2 sur 3</div>
+    <div class="cs-label" data-i18n="step2_label">Etape 2 sur 3</div>
     <div class="ct">Horaires &amp; photos</div>
     <div class="cd">Indiquez vos horaires d&#8217;ouverture et ajoutez des photos de votre commerce.</div>
     <div class="fg">
@@ -407,14 +409,14 @@ html[lang="ar"]{direction:rtl;}
     </div>
     <div class="fn">
       <button class="btn-bk" onclick="goStep(1)">&#8592; Retour</button>
-      <button class="btn-n" onclick="goStep3()">V&#233;rifier ma demande &#8594;</button>
+      <button class="btn-n" onclick="goStep3()" data-i18n="btn_check">V&#233;rifier ma demande &#8594;</button>
     </div>
   </div>
 
   <!-- ETAPE 3 -->
   <div class="fc" id="step3">
-    <div class="cs-label">Etape 3 sur 3</div>
-    <div class="ct">V&#233;rifiez et envoyez</div>
+    <div class="cs-label" data-i18n="step3_label">Etape 3 sur 3</div>
+    <div class="ct" data-i18n="step3_title">V&#233;rifiez et envoyez</div>
     <div class="cd">Relisez vos informations avant de soumettre votre demande d&#8217;inscription.</div>
     <div class="sum-block" id="sumBlock"></div>
     <div class="info-box"><strong>&#8505;&#65039; Ce qui se passe ensuite &#8212;</strong> Votre demande sera examin&#233;e sous <strong>24 &#224; 48 heures</strong>. Une fois valid&#233;e, votre commerce appara&#238;t sur la carte NearShop Drive et vous recevez un email de confirmation.</div>
@@ -427,7 +429,7 @@ html[lang="ar"]{direction:rtl;}
     </div>
     <div class="fn">
       <button class="btn-bk" onclick="goStep(2)">&#8592; Retour</button>
-      <button class="btn-n" id="subBtn" onclick="submitForm()"><span id="subLbl">&#9989; Soumettre ma demande</span><div class="spin" id="subSpin"></div></button>
+      <button class="btn-n" id="subBtn" onclick="submitForm()"><span id="subLbl" data-i18n="btn_submit">&#9989; Soumettre ma demande</span><div class="spin" id="subSpin"></div></button>
     </div>
   </div>
 
@@ -671,24 +673,68 @@ async function submitForm(){
   }
 }
 function showSuc(){document.getElementById('progBar').style.display='none';document.getElementById('step3').style.display='none';document.getElementById('sucScreen').classList.add('show');}
-// Init carte: on initialise immédiatement, puis invalidateSize après affichage
+// Init carte après le chargement complet
 window.addEventListener('load', () => {
-  // Initialiser la carte même si le container n'est pas visible
-  // Leaflet peut init sur un container display:none, mais on doit invalider après
   initMap();
-  // Invalider après que l'animation CSS soit terminée
-  setTimeout(() => { if (map) map.invalidateSize(); }, 400);
+  // invalidateSize multiple fois pour s'assurer que les tuiles se chargent
+  [200, 500, 1000, 2000].forEach(ms => setTimeout(() => { if (map) map.invalidateSize(true); }, ms));
 });
 
 /* ── Switchers Langue & Thème ── */
 const LANGS=['fr','en','ar'];
 const LANG_LABELS={fr:'FR',en:'EN',ar:'عر'};
 let langIdx=0;
+const T_INSCR = {
+  fr:{
+    nav_home:'Accueil', nav_register:'Inscrire mon commerce',
+    hero_badge:'Rejoignez NearShop Drive',
+    step1_label:'Étape 1 sur 3', step2_label:'Étape 2 sur 3', step3_label:'Étape 3 sur 3',
+    step1_title:'Localisez votre commerce sur la carte',
+    step2_title:'Horaires & photos',
+    step3_title:'Vérifiez et envoyez',
+    btn_continue:'Continuer → Horaires & photos',
+    btn_check:'Vérifier ma demande →',
+    btn_submit:'✅ Soumettre ma demande',
+    lbl_name:'Nom du commerce', lbl_cat:'Catégorie',
+    lbl_phone:'Téléphone', lbl_addr:'Adresse complète',
+  },
+  en:{
+    nav_home:'Home', nav_register:'Register my store',
+    hero_badge:'Join NearShop Drive',
+    step1_label:'Step 1 of 3', step2_label:'Step 2 of 3', step3_label:'Step 3 of 3',
+    step1_title:'Locate your store on the map',
+    step2_title:'Hours & photos',
+    step3_title:'Review and submit',
+    btn_continue:'Continue → Hours & photos',
+    btn_check:'Review my request →',
+    btn_submit:'✅ Submit my request',
+    lbl_name:'Store name', lbl_cat:'Category',
+    lbl_phone:'Phone', lbl_addr:'Full address',
+  },
+  ar:{
+    nav_home:'الرئيسية', nav_register:'سجّل تجارتك',
+    hero_badge:'انضم إلى NearShop Drive',
+    step1_label:'الخطوة 1 من 3', step2_label:'الخطوة 2 من 3', step3_label:'الخطوة 3 من 3',
+    step1_title:'حدد موقع تجارتك على الخريطة',
+    step2_title:'أوقات العمل والصور',
+    step3_title:'راجع وأرسل',
+    btn_continue:'التالي ← أوقات العمل والصور',
+    btn_check:'مراجعة طلبي ←',
+    btn_submit:'✅ إرسال طلبي',
+    lbl_name:'اسم التجارة', lbl_cat:'الفئة',
+    lbl_phone:'الهاتف', lbl_addr:'العنوان الكامل',
+  }
+};
 function applyLang(){
   const l=LANGS[langIdx];
   document.querySelectorAll('#langLabel,#langLabelM').forEach(el=>el.textContent=LANG_LABELS[l]||l.toUpperCase());
   document.documentElement.setAttribute('dir',l==='ar'?'rtl':'ltr');
   document.documentElement.lang=l;
+  const t=T_INSCR[l]||T_INSCR.fr;
+  document.querySelectorAll('[data-i18n]').forEach(el=>{
+    const k=el.getAttribute('data-i18n');
+    if(t[k]!==undefined) el.textContent=t[k];
+  });
   try{localStorage.setItem('nearshop_lang',l);}catch(e){}
 }
 function cycleLang(){langIdx=(langIdx+1)%LANGS.length;applyLang();}
